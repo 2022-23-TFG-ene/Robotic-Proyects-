@@ -24,7 +24,7 @@ RMD-X User Manual For Motion Actuator: http://dowload.gyems.cn/RMD-X%20user%20ma
 Errores
   
 # Reference
-Based on this library: 
+Based on this library:
 https://github.com/bump5236/RMDx8Arduino
 
 GYEMS's page:
