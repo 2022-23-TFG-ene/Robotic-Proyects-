@@ -12,7 +12,9 @@ RMD-X8, RMD-X8 pro MOTOR (24-48 V)
 
 Software
 
-CAN-BUS Shield
+CAN-BUS Shield:
+
+
 
 # Installation
 RMD-X User Manual For Motion Actuator: http://dowload.gyems.cn/RMD-X%20user%20manual%20V1.01-EN.pdf
