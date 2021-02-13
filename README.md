@@ -18,3 +18,14 @@ CAN-BUS Shield
 RMD-X User Manual For Motion Actuator: http://dowload.gyems.cn/RMD-X%20user%20manual%20V1.01-EN.pdf
 
 # Usage
+#include <RMDx8ArduinoUBU.h>
+
+# Note
+<<Errores>>
+  
+# Reference
+Based on this library: 
+https://github.com/bump5236/RMDx8Arduino
+
+GYEMS's page:
+GYEMS MOTOR CONTROL PROTOCOL (CAN BUS) V1.61: http://dowload.gyems.cn/RMD%20servo%20motor%20control%20protocol%20%28CAN%20BUS%20%29V1.61.pdf
