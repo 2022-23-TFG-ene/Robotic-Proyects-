@@ -99,65 +99,20 @@ void calculaMatrizDH(int filasusadas){
 		//Realizamos las multiplicaciones necesarias
 		//El orden de multiplicaciones debe ser beta, d, r, alfa
 		multiply(matriztem1,matriztem4,matrizTem);
-		printf("MATRIZ ----TEMP1\n");
-		int m =0;
-		int n=0;
-		for (m=0;m<4;m++){
-			for(n=0;n<4;n++){
-				printf("%f " ,matrizTem[m][n]);
-			}
-		printf("\n");
-		}
-		
 		multiply(matrizTem,matriztem3,matrizTemb);
-		printf("MATRIZ ----TEMP2\n");
-		int a =0;
-		int e=0;
-		for (a=0;a<4;a++){
-			for(e=0;e<4;e++){
-				printf("%f " ,matrizTemb[a][e]);
-			}
-		printf("\n");
-		}
-		
 		multiply(matrizTemb,matriztem2,matrizTem);
-		printf("MATRIZ_----TEMP3\n");
-		int o =0;
-		int p=0;
-		for (o=0;o<4;o++){
-			for(p=0;p<4;p++){
-				printf("%f " ,matrizTem[o][p]);
-			}
-		printf("\n");
-		}
 		copiarMatriz(matrizFinal,matrizFinalb);
 		multiply(matrizFinalb,matrizTem,matrizFinal);
-		printf("MATRIZ_----FINAL \n");
-		int q =0;
-		int r=0;
-		for (q=0;q<4;q++){
-			for(r=0;r<4;r++){
-				printf("%f " ,matrizFinal[q][r]);
-			}
-		printf("\n");
 		}	
+	printf("MATRIZ_----FINAL \n");
+	int q =0;
+	int r=0;
+	for (q=0;q<4;q++){
+		for(r=0;r<4;r++){
+			printf("%f " ,matrizFinal[q][r]);
+		}
+	printf("\n");
 	}
-	
-		//A continuación, una vez hemos insertado los valores en la matriz. 
-	
-	//printf("%f " ,matrizFinal[1][1]);
-	/*
-	int k =0;
-	int l=0;
-	for (k=0;k<4;k++){
-		for(l=0;l<4;l++){
-			printf("%f " ,matrizFinal[k][l]);
-			}
-		printf("\n");
-	}
-	* */
-	
-	
 }
 
 //Multiplica dos matrices y devuelve la matriz resultante. 
