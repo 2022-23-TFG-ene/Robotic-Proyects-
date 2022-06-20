@@ -89,44 +89,44 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][1000]){
 		
 		//Beta
 		//[0][0]
-		strcpy(strtemp,"cos(");
+		strcpy(strtemp,"c(");
 		strcat(strtemp,matriz[i][0]);
 		strcat(strtemp,")");
 		strcpy(matriztem1[0][0],strtemp);
 		//[0][1]
-		strcpy(strtemp,"(-sin(");
+		strcpy(strtemp,"(-s(");
 		strcat(strtemp,matriz[i][0]);
 		strcat(strtemp,"))");
 		strcpy(matriztem1[0][1],strtemp);
 		//[1][0]
-		strcpy(strtemp,"sin(");
+		strcpy(strtemp,"s(");
 		strcat(strtemp,matriz[i][0]);
 		strcat(strtemp,")");
 		strcpy(matriztem1[1][0],strtemp);
 		//[1][1]
-		strcpy(strtemp,"cos(");
+		strcpy(strtemp,"c(");
 		strcat(strtemp,matriz[i][0]);
 		strcat(strtemp,")");
 		strcpy(matriztem1[1][1],strtemp);
 		
 		//Alfa
 		//[0][0]
-		strcpy(strtemp,"cos(");
+		strcpy(strtemp,"c(");
 		strcat(strtemp,matriz[i][1]);
 		strcat(strtemp,")");
 		strcpy(matriztem2[1][1],strtemp);
 		//[0][1]
-		strcpy(strtemp,"(-sin(");
+		strcpy(strtemp,"(-s(");
 		strcat(strtemp,matriz[i][1]);
 		strcat(strtemp,"))");
 		strcpy(matriztem2[1][2],strtemp);
 		//[1][0]
-		strcpy(strtemp,"sin(");
+		strcpy(strtemp,"s(");
 		strcat(strtemp,matriz[i][1]);
 		strcat(strtemp,")");
 		strcpy(matriztem2[2][1],strtemp);
 		//[1][1]
-		strcpy(strtemp,"cos(");
+		strcpy(strtemp,"c(");
 		strcat(strtemp,matriz[i][1]);
 		strcat(strtemp,")");
 		strcpy(matriztem2[2][2],strtemp);
