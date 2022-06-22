@@ -179,8 +179,8 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 			posicioncola++;//hacer en el resto para marcar posicion de cola distinta de posicion de listaValores
 			
 		}
-
-		
+	
+		//AQUI ESTÁ TODO EL TINGLAO O ESO CREO
 		else if(expresion[i] == '('){
 			posicionpila=posicionpila+1;
 			strcpy(pila[posicionpila] , "(");
@@ -201,13 +201,15 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 					strcpy(pila[posicionpila],"0"); //Esto no lo hace bien 
 					posicionpila--;
 					break;
+					
 				}
 				else{
 					printf("\nEntra aquí?\n");
 					strcpy(cola[posicioncola],pila[posicionpila]);
-					posicionpila=posicionpila-1;	
+					strcpy(pila[posicionpila],"0");
+					posicionpila--;	
 					posicioncola++;
-					break;
+					
 				}
 			}
         }
@@ -215,9 +217,12 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
         else{
 			printf("\nEntra aquí??\n");
 			ptr=&expresion[i];
+            
             while(prioridad(pila[posicionpila]) >= prioridad(ptr)){//Esto también da infinito
 				//printf("Se queda pinzado aqui en el else");
+				printf("Entramos en while\n");
 				if (posicionpila>=0){
+					printf("Entramos en if\n");
 					//printf("ESTAAAAAAAMOS AQUIIIIIIII, topes: %d",top);
 					//strcpy(x,pila[top]);
 					
@@ -228,9 +233,14 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 					posicioncola++;
 					
 				}
+				/*
 				else{
+					posicionpila=posicionpila+1;
+					strcpy(pila[posicionpila] , ptr);
 					break;
 				}
+				* */
+				else{break;}
 			
 			}
 			
