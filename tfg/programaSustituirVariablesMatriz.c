@@ -149,18 +149,18 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
     int posicionlistaValores=1;//Empieza en 0 para que el primer valor sea 1 y se vea entre los 0
     char str[10];
     char *ptr;
+    char paraPuntero;
     int contador=0; // temporal borrar cuando acabe pruebas
-	
+	char str1[2];
+	char str2[5] = "";
     
     for(int i =0;i<strlen(expresion);i++){
 		if (expresion[i]==' '){
 			break;
 		}
-		printf("\n\nEXPRESION: %c, POSCOLA: %d, POSPILA: %d\n",expresion[i],posicioncola,posicionpila);
 		if(expresion[i]=='c'||expresion[i]=='s'||expresion[i]=='r'||expresion[i]=='d'||expresion[i]=='-'){ //Añadimos el menos, poruqe solo hay menos delantes de s
 			sprintf( str, "%d", posicionlistaValores );
 			strcpy(cola[posicioncola],str);
-			
 			if(expresion[i]== 'c'){
 				senosycosenos[posicioncola]=2;
 				i=i+4;
@@ -169,15 +169,12 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 				senosycosenos[posicioncola]=1;
 				i=i+4;
 			}
-			
 			if(expresion[i]== '-'){
-				printf("**********************************");
 				senosycosenos[posicioncola]=3;
 				i=i+5;
 			}
 			posicionlistaValores++;
 			posicioncola++;//hacer en el resto para marcar posicion de cola distinta de posicion de listaValores
-			
 		}
 	
 		//AQUI ESTÁ TODO EL TINGLAO O ESO CREO
@@ -190,104 +187,95 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 			//printf("ESTAMOS EN EL ELSE IF");
 			
 			while(1){
-				printf("\nEstamos aqui, posicion pila: %d", posicionpila);
-				printf("El valor en pila es %s",pila[posicionpila]);
 				if (posicionpila<0){
 					break;
 				}
 				
 				if(strcmp(pila[posicionpila], "(")==0){ //Esto es infinito
-					printf("\nEntra\n");
 					strcpy(pila[posicionpila],"0"); //Esto no lo hace bien 
 					posicionpila--;
 					break;
 					
 				}
 				else{
-					printf("\nEntra aquí?\n");
 					strcpy(cola[posicioncola],pila[posicionpila]);
 					strcpy(pila[posicionpila],"0");
 					posicionpila--;	
 					posicioncola++;
-					
 				}
 			}
         }
         
         else{
-			printf("\nEntra aquí??\n");
-			ptr=&expresion[i];
+			paraPuntero=expresion[i];
+			str1[0] = paraPuntero;
+			str1[1] = '\0';
+			strcpy(str2,str1);
             
-            while(prioridad(pila[posicionpila]) >= prioridad(ptr)){//Esto también da infinito
+            while(prioridad(pila[posicionpila]) >= prioridad(str2)){//Esto también da infinito
 				//printf("Se queda pinzado aqui en el else");
-				printf("Entramos en while\n");
+				if(strcmp(pila[posicionpila],"(")==0){
+						break;
+					}
 				if (posicionpila>=0){
-					printf("Entramos en if\n");
-					//printf("ESTAAAAAAAMOS AQUIIIIIIII, topes: %d",top);
-					//strcpy(x,pila[top]);
-					
-					
 					strcpy(cola[posicioncola],pila[posicionpila]);
 					strcpy(pila[posicionpila],"0");
-					posicionpila=posicionpila-1;
+					posicionpila--;
 					posicioncola++;
-					
 				}
-				/*
+				
 				else{
-					posicionpila=posicionpila+1;
-					strcpy(pila[posicionpila] , ptr);
 					break;
 				}
-				* */
-				else{break;}
-			
 			}
 			
-			printf("Estamos aquíi jejeje: %c ", expresion[i]);
 			switch(expresion[i]){
 				case '*':
-					printf("Vamonoooos");
 					posicionpila++;
 					strcpy(pila[posicionpila],"*");
 					break;
 				case '+':
-					printf("Vamonoooos2");
 					posicionpila++;
 					strcpy(pila[posicionpila],"+");
 					break;
 			}
+			
 
         }
-		printf("\n\nCCCCCCCCOOOOOOOOOOOOOOLLLLLLLLLLLLLLLAAAAAAAA\n");
-		for (int j=0;j<(sizeof(cola) / sizeof(cola[0]));j++){
-			printf("%s ,", cola[j]);
-		}
-		printf("\n\nPPPPPPPPPPPPPIIIIIIIIIIIIIILLLLLLLLLLLLLLLLLLLLAAAAAAAAAAAAAAAAAAAA\n");
-		for (int r=0;r<(sizeof(pila) / sizeof(pila[0]));r++){
-			printf("%s ,", pila[r]);
-		}
+		
 		
         
          
 	}
-	while(posicionpila>0){
+	while(posicionpila>=0){
 		strcpy(cola[posicioncola],pila[posicionpila]);
+		strcpy(pila[posicionpila],"0");
 		posicioncola++;
 		posicionpila--;	
 	}
 	
+	printf("\n\nCCCCCCCCOOOOOOOOOOOOOOLLLLLLLLLLLLLLLAAAAAAAA\n");
+	for (int j=0;j<(sizeof(cola) / sizeof(cola[0]));j++){
+		printf("%s ,", cola[j]);
+	}
+	printf("\n\nPPPPPPPPPPPPPIIIIIIIIIIIIIILLLLLLLLLLLLLLLLLLLLAAAAAAAAAAAAAAAAAAAA\n");
+	for (int r=0;r<(sizeof(pila) / sizeof(pila[0]));r++){
+		printf("%s ,", pila[r]);
+	}
     
 }
 
 
 int prioridad(char *x){
-    if(strcmp(x,"("))
-        return 3;
-    if(strcmp(x ,"+"))
+    if(strcmp(x,"(\0")==0){
+        return 0;
+    }
+    if(strcmp(x ,"+\0")==0){
         return 1;
-    if(strcmp(x ,"*"))
+    }
+    if(strcmp(x ,"*\0")==0){
         return 2;
+	}
     return 0;
 }
 
