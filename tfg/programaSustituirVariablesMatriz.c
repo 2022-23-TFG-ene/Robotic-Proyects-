@@ -20,6 +20,7 @@ void matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX])
 
 int prioridad(char x);
 void inicializarMatrizZeros2(char cola[NUMCARACMAX]);
+
 //Los valores que se cambien en matriz afectarán a los valores de listaValores porque apuntan a los mismos.
 //Por lo que no es necesario crear de nuevo listaValores ya que siempre estará actualizada.
 int main(){
@@ -128,9 +129,7 @@ void sacarListaValores(float matriz[NUMMOT][4],char matriztem[4][4][NUMCARACMAX]
 
 void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX]){	
     char temporal[NUMCARACMAX];
-    char cadenaTemp[NUMCARACMAX];
-    //parsearString(matriztem[0][0],listaValores,matrizPosFijo,temporal);
-    
+    char cadenaTemp[NUMCARACMAX]; 
     
     for(int i=0;i<4;i++){
 		for(int j=0;j<4;j++){
@@ -142,21 +141,11 @@ void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int
 			for (int r=0;r<strlen(temporal);r++){
 				printf("%c", temporal[r]);
 			}
-	
 			matrizCharAString(temporal,cadenaTemp);
-			//strcpy(matriztem[i][j],cadenaTemp);
 			strcpy(matrizPosFijo[i][j],cadenaTemp);
 		}
 	}
 	
-	/*
-	strcpy(cadenaTemp,"");
-	inicializarMatrizZeros2(temporal);
-	parsearString(matriztem[0][1],listaValores,matrizPosFijo,temporal);
-	printf("\n\nHASTA AQUI\n");
-	matrizCharAString(temporal,cadenaTemp);
-	strcpy(matriztem[0][1],cadenaTemp);
-	*/
 	printf("MATRIZ PARSEADA\n");
 	int a =0;
 	int b=0;
@@ -172,11 +161,8 @@ void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int
 void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],char temporal[NUMCARACMAX]){
 	char pila[NUMCARACMAX];
 	char cola[NUMCARACMAX]; 
-	printf("turno de cola\n");
 	inicializarMatrizZeros2(cola);
-	printf("turno de pila\n");
 	inicializarMatrizZeros2(pila);
-	//strcpy(pila,cola);
 	
     int posicionpila = -1;
     int senosycosenos[NUMCARACMAX];//1 seno, 2 coseno. 3 -sen
@@ -189,23 +175,7 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 	char str1[2];
 	char str2[5] = "";
     
-    
-    //printf("\n\EEEEEEEESSSSSSPPPPPREEEEEESSSSSIIIIIIIOOOOONN\n");
-    /*
-	for (int t=0;t<strlen(expresion);t++){
-		printf("%c", expresion[t]);
-	}
-    */
     for(int i =0;i<strlen(expresion);i++){
-		/*
-		printf("\nEVOLUCION COLA\n");
-        printf("%s \n,", cola);
-		printf("\nEVOLUCION PILA\n");
-		printf("%s ,", pila); 
-		* */
-		//printf("PPPPPPPAARSEAAAA\n");
-		//printf("*****************Exp: %c\n", expresion[5]);
-
 		if (expresion[i]==' '){
 			continue;
 		}
@@ -216,7 +186,6 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 		}
 		if(expresion[i]=='c'||expresion[i]=='s'||expresion[i]=='r'||expresion[i]=='d'||expresion[i]=='-'){ //Añadimos el menos, poruqe solo hay menos delantes de s
 			sprintf( str, "%d", posicionlistaValores );
-			//strcpy(cola[posicioncola],str);
 			cola[posicioncola]='2';
 			if(expresion[i]== 'c'){
 				senosycosenos[posicioncola]=2;
@@ -234,16 +203,12 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 			posicioncola++;//hacer en el resto para marcar posicion de cola distinta de posicion de listaValores
 		}
 	
-		//AQUI ESTÁ TODO EL TINGLAO O ESO CREO
 		else if(expresion[i] == '('){
-			//printf("PPPPPPPAARSEAAAA2\n");
 			posicionpila=posicionpila+1;
 			pila[posicionpila] = '(';
 		}
         
         else if(expresion[i] == ')'){
-			//printf("ESTAMOS EN EL ELSE IF");
-			
 			while(1){
 				if (posicionpila<0){
 					break;
@@ -265,14 +230,7 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
         }
         
         else{
-			//BORRAR QUE DE ESTO NO SE USA
-			paraPuntero=expresion[i];
-			str1[0] = paraPuntero;
-			str1[1] = '\0';
-			strcpy(str2,str1);
-            
             while(prioridad(pila[posicionpila]) >= prioridad(expresion[i])){//Esto también da infinito
-				//printf("Se queda pinzado aqui en el else");
 				if(pila[posicionpila]=='('){
 						break;
 					}
@@ -299,7 +257,6 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 					break;
 			}
         } 
-           
 	}
 	while(posicionpila>=0){
 		cola[posicioncola]=pila[posicionpila];
@@ -307,34 +264,8 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 		posicioncola++;
 		posicionpila--;	
 	}
-	
-	/*
-	printf("\n\nPPPPPPPPPPPPPIIIIIIIIIIIIIILLLLLLLLLLLLLLLLLLLLAAAAAAAAAAAAAAAAAAAA\n");
-	for (int r=0;r<strlen(pila);r++){
-		printf("%s ,", pila);
-	}
-	
-	printf("\n\nPPPPPPPPPPPPPIIIIIIIIIIIIIILLLLLLLLLLLLLLLLLLLLAAAAAAAAAAAAAAAAAAAA\n");
-	
-	for (int l=0;l<NUMCARACMAX;l++){
-		temporal[NUMCARACMAX]=cola[NUMCARACMAX];
-	}
-	*/
-	//hay basura al final de cola por alguna razón. Temporalmente se soluciona de la siguiente manera. 
-	/*
-	for (int p=posicioncola;p<strlen(cola);p++){
-		cola[p]='0';
-	}
-	*/
 	cola[posicioncola]='\0';
-	/*
-	for (int l=0;l<NUMCARACMAX;l++){
-		temporal[NUMCARACMAX]=cola[NUMCARACMAX];
-	}
-	* */
 	strcpy(temporal,cola);
-	//temporal[posicioncola]='\0';
-	
 }
 
 
@@ -353,13 +284,11 @@ int prioridad(char x){
 
 void matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX]){
 	char str1[2];
-	
 	str1[1] = '\0';
-	for (int i=0;i<NUMCARACMAX;i++){
+	for (int i=0;i<NUMCARACMAX && temporal[i]!='0';i++){
 		str1[0] = temporal[i];
 		strcat(cadenaTemp,str1);
 	}
-	
 }
 
 
