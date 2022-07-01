@@ -4,7 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdlib.h> 
 
 
 int NUMMOT=2;
@@ -14,13 +14,14 @@ void itroducirMotores(float matriz[NUMMOT][4]);
 void csvAMatriz(char matriztem[4][4][NUMCARACMAX]);
 void inicializarMatrizZeros(char mat[4][4][NUMCARACMAX]);
 void sacarListaValores(float matriz[NUMMOT][4],char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)]);
-void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX]);
-void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],char temporal[NUMCARACMAX]);
+void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],int senosycosenos[NUMCARACMAX],int possenoycoseno);
+int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],char temporal[NUMCARACMAX],int senosycosenos[NUMCARACMAX],int possenoycoseno);
 void matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX]);
-
 int prioridad(char x);
 void inicializarMatrizZeros2(char cola[NUMCARACMAX]);
-
+void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],float resultado[4][4]);
+float postfixStringAResultado(char matrizPosFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX]);
+void inicializarArrayZeros(int cola[NUMCARACMAX]);
 //Los valores que se cambien en matriz afectarán a los valores de listaValores porque apuntan a los mismos.
 //Por lo que no es necesario crear de nuevo listaValores ya que siempre estará actualizada.
 int main(){
@@ -30,13 +31,17 @@ int main(){
 	inicializarMatrizZeros(matrizPosFijo);
 	float *listaValores[(int)(NUMCARACMAX/4)];
 	//inicializarArray(listaValores);
+	int senosycosenos[NUMCARACMAX];//1 seno, 2 coseno. 3 -sen
+	int possenoycoseno=0;
+	inicializarArrayZeros(senosycosenos);
+	float resultado[4][4];
 	
 	itroducirMotores(matriz);
 	inicializarMatrizZeros(matriztem);
 	csvAMatriz(matriztem);
 	sacarListaValores(matriz,matriztem,listaValores);
-	parsearMatrizTem(matriztem,listaValores,matrizPosFijo);
-	
+	parsearMatrizTem(matriztem,listaValores,matrizPosFijo,senosycosenos,possenoycoseno);
+	sustitucionYCalculoDatosMatrizParseada(matrizPosFijo,listaValores,senosycosenos,resultado);
 	return 0;
 }
 
@@ -97,6 +102,13 @@ void inicializarMatrizZeros2(char cola[NUMCARACMAX]){
 	}
 }
 
+void inicializarArrayZeros(int cola[NUMCARACMAX]){
+	for(int i=0;i<NUMCARACMAX;i++){
+        cola[i]=0;
+	}
+}
+
+
 void sacarListaValores(float matriz[NUMMOT][4],char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)]){
 	int posicionListaValores=0;
 	for(int i=0;i<4;i++){
@@ -122,31 +134,27 @@ void sacarListaValores(float matriz[NUMMOT][4],char matriztem[4][4][NUMCARACMAX]
 		}
 	}	
 	//Borrar cuando esté
+	printf("valores a sustituir en matriz\n");
 	for (int z =0;z<=posicionListaValores-1;z++){  
 		printf("%f  ",*listaValores[z]);
 	}
 }
 
-void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX]){	
+void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],int senosycosenos[NUMCARACMAX],int possenoycoseno){	
     char temporal[NUMCARACMAX];
     char cadenaTemp[NUMCARACMAX]; 
-    
+    //int senosycosenos[NUMCARACMAX];//1 seno, 2 coseno. 3 -sen
     for(int i=0;i<4;i++){
 		for(int j=0;j<4;j++){
-			printf("\n\n\n NUEVA ITERACION: %d-%d-%s", i, j,matriztem[i][j]);
 			strcpy(cadenaTemp,"");
 			inicializarMatrizZeros2(temporal);
-			parsearString(matriztem[i][j],listaValores,matrizPosFijo,temporal);
-			printf("TEMPOOOOOOOOOOOOOOOOOOOOORAL***");
-			for (int r=0;r<strlen(temporal);r++){
-				printf("%c", temporal[r]);
-			}
+			possenoycoseno=parsearString(matriztem[i][j],listaValores,matrizPosFijo,temporal,senosycosenos,possenoycoseno);
 			matrizCharAString(temporal,cadenaTemp);
 			strcpy(matrizPosFijo[i][j],cadenaTemp);
 		}
 	}
 	
-	printf("MATRIZ PARSEADA\n");
+	printf("\n\nMATRIZ PARSEADA\n");
 	int a =0;
 	int b=0;
 	for (a=0;a<4;a++){
@@ -158,14 +166,15 @@ void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int
 	
 }
 
-void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],char temporal[NUMCARACMAX]){
+int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],char temporal[NUMCARACMAX],int senosycosenos[NUMCARACMAX],int possenoycoseno){
 	char pila[NUMCARACMAX];
 	char cola[NUMCARACMAX]; 
 	inicializarMatrizZeros2(cola);
 	inicializarMatrizZeros2(pila);
 	
+	
     int posicionpila = -1;
-    int senosycosenos[NUMCARACMAX];//1 seno, 2 coseno. 3 -sen
+    //int senosycosenos[NUMCARACMAX];//1 seno, 2 coseno. 3 -sen
     int posicioncola=0;
     int posicionlistaValores=1;//Empieza en 0 para que el primer valor sea 1 y se vea entre los 0
     char str[10];
@@ -188,19 +197,23 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 			sprintf( str, "%d", posicionlistaValores );
 			cola[posicioncola]='2';
 			if(expresion[i]== 'c'){
-				senosycosenos[posicioncola]=2;
+				senosycosenos[possenoycoseno]=2;//2
 				i=i+4;
+				possenoycoseno++;
 			}
 			if(expresion[i]== 's'){
-				senosycosenos[posicioncola]=1;
+				senosycosenos[possenoycoseno]=1;
 				i=i+4;
+				possenoycoseno++;
 			}
 			if(expresion[i]== '-'){
-				senosycosenos[posicioncola]=3;
+				senosycosenos[possenoycoseno]=3;//3
 				i=i+5;
+				possenoycoseno++;
 			}
 			posicionlistaValores++;
 			posicioncola++;//hacer en el resto para marcar posicion de cola distinta de posicion de listaValores
+			
 		}
 	
 		else if(expresion[i] == '('){
@@ -213,12 +226,10 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 				if (posicionpila<0){
 					break;
 				}
-				
 				if(pila[posicionpila]== '('){ //Esto es infinito
 					pila[posicionpila]='0'; //Esto no lo hace bien 
 					posicionpila--;
 					break;
-					
 				}
 				else{
 					cola[posicioncola]=pila[posicionpila];
@@ -266,6 +277,8 @@ void parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARA
 	}
 	cola[posicioncola]='\0';
 	strcpy(temporal,cola);
+	
+	return possenoycoseno;
 }
 
 
@@ -291,6 +304,105 @@ void matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX])
 	}
 }
 
+void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],float resultado[4][4]){
+	
+	for (int i=0;i<4;i++){
+		for (int j=0;j<4;j++){
+			resultado[i][j]=postfixStringAResultado(matrizPosFijo[i][j],listaValores,senosycosenos);
+		}		
+	}
+	
+	
+	//resultado[0][0]=postfixStringAResultado(matrizPosFijo[0][0],listaValores,senosycosenos);
+	printf("\nMatriz Final\n");
+	for (int o=0;o<4;o++){
+		for(int p=0;p<4;p++){
+			printf("%f	",resultado[o][p]);
+		}
+	}
+	
+}
+
+float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX]){
+	int resultadoTemporal=0;
+	float pila[strlen(arrayPostFijo)];//Será más pequeño siempre que el número de elementos que haya.
+	int posicionPila=0;
+	int posicionListaValores=0;
+	float temporal1=0,temporal2=0;
+	
+	if(arrayPostFijo[0]=='\0'){
+		return 0;
+	}
+	
+	/*
+	if(arrayPostFijo[0]=='1'){
+		return 1;
+	}
+	* */
+	printf("\npost fijo es, %ld\n",strlen(arrayPostFijo));
+	for (int z =0;z<=strlen(arrayPostFijo);z++){  
+		printf("%c",arrayPostFijo[z]);
+	}
+	
+	printf("\nESTO ES SENOS Y COSENOS\n");
+	for (int q =0;q<=NUMCARACMAX;q++){  
+		printf("%d",senosycosenos[q]);
+	}
+	
+	for (int i =0;i< strlen(arrayPostFijo);i++){
+		
+		printf("\n\n--------------------------------pila_----\n");
+		for (int j=0;j<strlen(arrayPostFijo);j++ ){
+			printf("%f : ",pila[j]);
+		}
+		printf("\n\n");
+		
+		if (arrayPostFijo[i]=='2'){
+			//printf("*******");
+			//seno 1 coseno 2 -seno 3
+			//Pasamos los ángulos de grados a radiantes para aplicar las funciones matemáticas.
+			if(senosycosenos[posicionListaValores]==1){
+				pila[posicionPila]=sin(*listaValores[posicionListaValores]*(3.141592/180))*(3.180/3.141592);//*(3.141592/180)
+				//printf("SENO-------%f",pila[posicionPila]);
+			}
+			if(senosycosenos[posicionListaValores]==2){
+				pila[posicionPila]=cos(*listaValores[posicionListaValores]*(3.141592/180))*(3.180/3.141592);
+				//printf("COSENO-------%f",pila[posicionPila]);
+
+			}
+			if(senosycosenos[posicionListaValores]==3){
+				pila[posicionPila]=-sin(*listaValores[posicionListaValores]*(3.141592/180))*(3.180/3.141592);
+				//printf("-SENO-------%f",pila[posicionPila]);
+			}
+			posicionPila++;
+			posicionListaValores++;	
+		}
+		else{
+			posicionPila--;
+			temporal2=pila[posicionPila];
+			posicionPila--;
+			temporal1=pila[posicionPila];
+			pila[posicionPila+1]=0;
+			if (arrayPostFijo[i]=='+'){
+				pila[posicionPila]=temporal2+temporal1;
+				posicionPila++;
+			}
+			else{
+				pila[posicionPila]=temporal2*temporal1;
+				posicionPila++;
+			}
+		}
+	}
+	
+	
+	printf("\n\n--------------------------------pila*\n");
+	for (int j=0;j<strlen(arrayPostFijo);j++ ){
+		printf("%f : ",pila[j]);
+	}
+	printf("\n\n");
+	printf("-------RESULTADOS: %f",pila[0]);
+	return pila[0];
+}
 
 
 
