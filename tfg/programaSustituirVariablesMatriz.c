@@ -334,11 +334,11 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 		return 0;
 	}
 	
-	/*
+	
 	if(arrayPostFijo[0]=='1'){
 		return 1;
 	}
-	* */
+	
 	printf("\npost fijo es, %ld\n",strlen(arrayPostFijo));
 	for (int z =0;z<=strlen(arrayPostFijo);z++){  
 		printf("%c",arrayPostFijo[z]);
@@ -351,27 +351,32 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 	
 	for (int i =0;i< strlen(arrayPostFijo);i++){
 		
-		printf("\n\n--------------------------------pila_----\n");
+		printf("\n\n--------------------------------pila_----, iteracion: %d\n",i);
 		for (int j=0;j<strlen(arrayPostFijo);j++ ){
 			printf("%f : ",pila[j]);
 		}
 		printf("\n\n");
 		
 		if (arrayPostFijo[i]=='2'){
-			//printf("*******");
+			printf("Es 2\n");
 			//seno 1 coseno 2 -seno 3
 			//Pasamos los ángulos de grados a radiantes para aplicar las funciones matemáticas.
 			if(senosycosenos[posicionListaValores]==1){
-				pila[posicionPila]=sin(*listaValores[posicionListaValores]*(3.141592/180))*(3.180/3.141592);//*(3.141592/180)
+				printf("Estamos en seno\n");
+				pila[posicionPila]=sin(*listaValores[posicionListaValores]*(3.141592/180));//*(3.141592/180)
 				//printf("SENO-------%f",pila[posicionPila]);
 			}
 			if(senosycosenos[posicionListaValores]==2){
-				pila[posicionPila]=cos(*listaValores[posicionListaValores]*(3.141592/180))*(3.180/3.141592);
+				printf("Estamos en coseno\n");
+				pila[posicionPila]=cos(*listaValores[posicionListaValores]*(3.141592/180));
+				printf("posicionListaValores: %d\n",posicionListaValores);
+				printf("listaValores: %f\n",*listaValores[posicionListaValores]);
 				//printf("COSENO-------%f",pila[posicionPila]);
 
 			}
 			if(senosycosenos[posicionListaValores]==3){
-				pila[posicionPila]=-sin(*listaValores[posicionListaValores]*(3.141592/180))*(3.180/3.141592);
+				printf("Estamos en -seno\n");
+				pila[posicionPila]=-sin(*listaValores[posicionListaValores]*(3.141592/180));
 				//printf("-SENO-------%f",pila[posicionPila]);
 			}
 			posicionPila++;
