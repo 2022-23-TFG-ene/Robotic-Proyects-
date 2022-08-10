@@ -6,6 +6,7 @@
 
 char  matriz[4][10][10]; 
 
+int datosIniciales();
 void AnadirMotor(int fila);
 void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][1000]);
 void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]);
@@ -16,42 +17,59 @@ void envolverParentesis(char mat1[4][4][1000]);
 void guardarMatrizenFichero(char mat1[4][4][1000]);
 
 
-
 int main(){
 	char matrizFinal[4][4][1000];
-	printf("************************************************************\n");
-	printf("* Introduzca los motores y brazos que se van a usar.       *\n");
-	printf("* El primer elemento a introducir deberá ser un motor.     *\n");
-	printf("* Posteriormente se irán intercalando motores y segmentos. *\n");
-	printf("* Los segmentos no tienen dirección ya uqe va determinada  *\n");
-	printf("* Por el motor.											   *\n");
-	printf("************************************************************\n");
-	//Contador tamaño
 	int tamano=0;
-	while(1){
-		AnadirMotor(tamano);
-		tamano=tamano+1;
-		printf( "Pulsa cualquier tecla para continuar añadiendo motores/segmentos \n" );
-		printf( "Pulsa Q para acabar. " );
-		char c;
-		fflush(stdin);
-		scanf(" %c", &c);
-		fflush(stdin);
-		if (c == 'Q'){
-			break;
-		} 
-	}
+	
+	printf("************************************************************\n");
+	printf("* Este programa crea la matriz de DH de los motores que    *\n");
+	printf("* indique el usuario.                                      *\n");
+	printf("*                                                          *\n");
+	printf("* Dicha matriz es creada en un archivo CSV.                *\n");
+	printf("*                                                          *\n");
+	printf("* Autor: Jaime Sáiz de la Peña                             *\n");
+	printf("*                                                          *\n");
+	printf("************************************************************\n");
+	
+	tamano=datosIniciales();
 	calculaMatrizDH(tamano,matrizFinal);
 	guardarMatrizenFichero(matrizFinal);
 return 0;
 }
 
+int datosIniciales(){
+	char temporal [1]="";
+	int nmotores=0;
+	printf("Introduzca el número de motores con los que desea trabajar: ");
+	scanf(" %d",&nmotores);
+	for (int i=0;i<nmotores;i++){
+		for (int j=0;j<4;j++){
+			if (j==0){
+				//strcpy(matriz[i][j],"b");
+				sprintf(matriz[i][j], "b%d",i+1);
+			}
+			if (j==1){
+				sprintf(matriz[i][j], "a%d",i+1);
+			}
+			if (j==2){
+				sprintf(matriz[i][j], "r%d",i+1);
+			}
+			if (j==3){
+				sprintf(matriz[i][j], "d%d",i+1);
+			}
+		}
+	}
+	return nmotores;
+}
+
 //Esta función lo que hará será añadir Motores a la secuencia de motores y Segmentos
+//de forma manual (sustituiría a datosIniciales que lo hace de forma automática)
+/*
 void AnadirMotor(int fila){
 	printf("Introducir Motor beta alfa r d (separado por espacios)\n");
 	scanf("%s" "%s" "%s" "%s",matriz[fila][0],matriz[fila][1],matriz[fila][2],matriz[fila][3] );
 }
-
+*/
 
 void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][1000]){
 	
@@ -199,10 +217,6 @@ void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]){
         for(int j=0;j<4;j++){
             strcpy(temporal,"");
             for(int k=0;k<4;k++){ 
-				printf("-------------- %d - %d - %d \n", i, j ,k);
-				printf("MAT1: %s\n",mat1[i][k]);
-				printf("MAT2: %s\n",mat2[k][j]);
-				printf("MUL: %s\n",mul[i][j]);
                 //if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 ){
 				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")!=0){
 					
@@ -268,24 +282,8 @@ void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]){
 				} 
 				 
             }
-           // printf("***************Resul temp mul %s\n", mul[i][j]);
         }
     }
-    //recorrer todo mul
-    /*
-    int a =0;
-	int b=0;
-	for (a=0;a<4;a++){
-		for(b=0;b<4;b++){
-			if (strcmp(mul[a][b],"1" )!=0 && strcmp(mul[a][b],"0" )!=0){
-				strcpy(temporal,mul[a][b]);
-				strcpy(mul[a][b],"(");
-				strcat(mul[a][b],temporal);
-				strcat(mul[a][b],")");
-			}
-		}	
-	}
-	*/
 }
 
 void inicializarMatrizIdentidad(char mat1[4][4][1000]){
