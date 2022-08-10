@@ -165,6 +165,20 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][1000]){
 			printf("\n\nMATRIZ ----matrizTemb\n");
 			multiply(matrizTemb,matrizFinalb,matrizFinal);
 		}
+		
+		char temporal[1000];
+		int q =0;
+		int w=0;
+		for (q=0;q<4;q++){
+			for(w=0;w<4;w++){
+				if (strcmp(matrizFinal[q][w],"1" )!=0 && strcmp(matrizFinal[q][w],"0" )!=0){
+					strcpy(temporal,matrizFinal[q][w]);
+					strcpy(matrizFinal[q][w],"(");
+					strcat(matrizFinal[q][w],temporal);
+					strcat(matrizFinal[q][w],")");
+				}
+			}	
+		}
 	}
 	printf("MATRIZ ----FINAL\n");
 	int a =0;
@@ -239,7 +253,7 @@ void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]){
 					}
 					if (strcmp(mat1[i][k],"1" )==0){
 						strcpy(mul[i][j],mat2[k][j]);
-						strcpy(mul[i][j],mat2[k][j]);
+						//strcpy(mul[i][j],mat2[k][j]);
 						continue;
 					}else if(strcmp(mat2[k][j],"1")==0){
 						strcpy(mul[i][j],mat1[i][k]);
@@ -257,6 +271,21 @@ void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]){
            // printf("***************Resul temp mul %s\n", mul[i][j]);
         }
     }
+    //recorrer todo mul
+    /*
+    int a =0;
+	int b=0;
+	for (a=0;a<4;a++){
+		for(b=0;b<4;b++){
+			if (strcmp(mul[a][b],"1" )!=0 && strcmp(mul[a][b],"0" )!=0){
+				strcpy(temporal,mul[a][b]);
+				strcpy(mul[a][b],"(");
+				strcat(mul[a][b],temporal);
+				strcat(mul[a][b],")");
+			}
+		}	
+	}
+	*/
 }
 
 void inicializarMatrizIdentidad(char mat1[4][4][1000]){
