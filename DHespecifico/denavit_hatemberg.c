@@ -184,11 +184,20 @@ void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]){
     for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
             strcpy(temporal,"");
-            for(int k=0;k<4;k++){   
-                if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")!=0){
+            for(int k=0;k<4;k++){ 
+				printf("-------------- %d - %d - %d \n", i, j ,k);
+				printf("MAT1: %s\n",mat1[i][k]);
+				printf("MAT2: %s\n",mat2[k][j]);
+				printf("MUL: %s\n",mul[i][j]);
+                //if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 ){
+				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")!=0){
+					
+					
 					//printf("Opcion 1\n");
 					//entra siempre
-					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 && strcmp(mul[k][j],"1" )==0 ){
+
+//					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 && strcmp(mul[k][j],"1" )==0 ){		//Comprobar k o i
+					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 && strcmp(mul[i][j],"1" )==0 ){
 						continue;
 					}
 					
@@ -204,9 +213,11 @@ void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]){
 					
 					
 					if (strcmp(mat1[i][k],"1" )==0){
+						strcat(mul[i][j],"+");//nuevo
 						strcat(mul[i][j],mat2[k][j]);
 						continue;
 					}else if(strcmp(mat2[k][j],"1")==0){
+						strcat(mul[i][j],"+");//nuevo
 						strcat(mul[i][j],mat1[i][k]);
 						continue;
 					}else{
@@ -220,6 +231,7 @@ void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]){
 					
 					
 				}
+				
 				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")==0){
 					if (strcmp(mat1[i][k],"1" )==0 && strcmp(mat2[k][j],"1" )==0){
 						strcpy(mul[i][j],"1");
@@ -239,8 +251,10 @@ void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]){
 					strcat(temporal,mat2[k][j]);
 					strcpy(mul[i][j],temporal);
 					continue;	
-				}             
+				} 
+				 
             }
+           // printf("***************Resul temp mul %s\n", mul[i][j]);
         }
     }
 }
