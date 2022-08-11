@@ -8,7 +8,7 @@
 
 
 int NUMMOT=2;
-int NUMCARACMAX=100; //100: válido para 2
+int NUMCARACMAX=1000; //100: válido para 2
 
 void itroducirMotores(float matriz[NUMMOT][4]);
 void csvAMatriz(char matriztem[4][4][NUMCARACMAX]);
@@ -22,19 +22,28 @@ void inicializarMatrizZeros2(char cola[NUMCARACMAX]);
 void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],float resultado[4][4]);
 float postfixStringAResultado(char matrizPosFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX]);
 void inicializarArrayZeros(int cola[NUMCARACMAX]);
+int tipoIntroduccionDatos();
 //Los valores que se cambien en matriz afectarán a los valores de listaValores porque apuntan a los mismos.
 //Por lo que no es necesario crear de nuevo listaValores ya que siempre estará actualizada.
 int main(){
+	printf("Introduzca el número de motores: ");
+	scanf(" %d",&NUMMOT);
 	float matriz[NUMMOT][4]; 
 	char matriztem[4][4][NUMCARACMAX]; 
 	char matrizPosFijo[4][4][NUMCARACMAX]; 
-	inicializarMatrizZeros(matrizPosFijo);
 	float *listaValores[(int)(NUMCARACMAX/4)];
 	//inicializarArray(listaValores);
 	int senosycosenos[NUMCARACMAX];//1 seno, 2 coseno. 3 -sen
 	int possenoycoseno=0;
-	inicializarArrayZeros(senosycosenos);
 	float resultado[4][4];
+	int introduccionDatos=0;
+	
+	inicializarMatrizZeros(matrizPosFijo);
+	inicializarArrayZeros(senosycosenos);
+	printf("\nIntroduzca la forma en la que desea introducir los motores: \n");
+	printf("	- \"1\" si desea hacerlo de forma manual \n");
+	printf("	- \"2\" si desea seguir los pasos de DH \n");
+	scanf(" %d",&introduccionDatos);
 	
 	itroducirMotores(matriz);
 	inicializarMatrizZeros(matriztem);
@@ -43,6 +52,7 @@ int main(){
 	parsearMatrizTem(matriztem,listaValores,matrizPosFijo,senosycosenos,possenoycoseno);
 	sustitucionYCalculoDatosMatrizParseada(matrizPosFijo,listaValores,senosycosenos,resultado);
 	return 0;
+
 }
 
 void itroducirMotores(float matriz[NUMMOT][4]){
