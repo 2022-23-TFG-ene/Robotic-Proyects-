@@ -4,21 +4,22 @@
 #include<stdlib.h>
 #include<string.h>
 
-char  matriz[4][10][10]; 
-
+int NUMCARACMAX=10000;
+char  matriz[4][10][10];
+ 
 int datosIniciales();
 void AnadirMotor(int fila);
-void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][1000]);
-void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]);
-void inicializarMatrizIdentidad(char mat1[4][4][1000]);
-void copiarMatriz(char mat1[4][4][1000],char mat2[4][4][1000]);
-void inicializarMatrizZeros(char mat1[4][4][1000]);
-void envolverParentesis(char mat1[4][4][1000]);
-void guardarMatrizenFichero(char mat1[4][4][1000]);
+void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX]);
+void multiply(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX],char mul[4][4][NUMCARACMAX]);
+void inicializarMatrizIdentidad(char mat1[4][4][NUMCARACMAX]);
+void copiarMatriz(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX]);
+void inicializarMatrizZeros(char mat1[4][4][NUMCARACMAX]);
+void envolverParentesis(char mat1[4][4][NUMCARACMAX]);
+void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX]);
 
 
 int main(){
-	char matrizFinal[4][4][1000];
+	char matrizFinal[4][4][NUMCARACMAX];
 	int tamano=0;
 	
 	printf("************************************************************\n");
@@ -71,18 +72,18 @@ void AnadirMotor(int fila){
 }
 */
 
-void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][1000]){
+void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX]){
 	
 	//numero de elementos, filas, columnas
 	
-	char matriztem1[4][4][1000]; //La usaremos si hay datos en beta 
-	char matriztem2[4][4][1000]; //La usaremos si hay datos en alfa
-	char matriztem3[4][4][1000]; //La usaremos si hay datos en r
-	char matriztem4[4][4][1000]; //La usaremos si hay datos en d
-	char matrizTem[4][4][1000]; //Matriz para calcular datos temporales
-	char matrizTemb[4][4][1000];
-	//char matrizFinal[4][4][1000]; //Matriz Final
-	char matrizFinalb[4][4][1000];
+	char matriztem1[4][4][NUMCARACMAX]; //La usaremos si hay datos en beta 
+	char matriztem2[4][4][NUMCARACMAX]; //La usaremos si hay datos en alfa
+	char matriztem3[4][4][NUMCARACMAX]; //La usaremos si hay datos en r
+	char matriztem4[4][4][NUMCARACMAX]; //La usaremos si hay datos en d
+	char matrizTem[4][4][NUMCARACMAX]; //Matriz para calcular datos temporales
+	char matrizTemb[4][4][NUMCARACMAX];
+	//char matrizFinal[4][4][NUMCARACMAX]; //Matriz Final
+	char matrizFinalb[4][4][NUMCARACMAX];
 
 	int flag=0;
 	
@@ -184,7 +185,7 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][1000]){
 			multiply(matrizTemb,matrizFinalb,matrizFinal);
 		}
 		
-		char temporal[1000];
+		char temporal[NUMCARACMAX];
 		int q =0;
 		int w=0;
 		for (q=0;q<4;q++){
@@ -211,8 +212,8 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][1000]){
 }
 
 //Multiplica dos matrices y devuelve la matriz resultante. 
-void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]){
-	char temporal[1000];
+void multiply(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX],char mul[4][4][NUMCARACMAX]){
+	char temporal[NUMCARACMAX];
     for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
             strcpy(temporal,"");
@@ -286,7 +287,7 @@ void multiply(char mat1[4][4][1000],char mat2[4][4][1000],char mul[4][4][1000]){
     }
 }
 
-void inicializarMatrizIdentidad(char mat1[4][4][1000]){
+void inicializarMatrizIdentidad(char mat1[4][4][NUMCARACMAX]){
 	for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
 			if(i==j){
@@ -298,7 +299,7 @@ void inicializarMatrizIdentidad(char mat1[4][4][1000]){
 	}
 }
 
-void inicializarMatrizZeros(char mat1[4][4][1000]){
+void inicializarMatrizZeros(char mat1[4][4][NUMCARACMAX]){
 	for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
 			strcpy(mat1[i][j],"0");
@@ -306,7 +307,7 @@ void inicializarMatrizZeros(char mat1[4][4][1000]){
 	}
 }
 
-void copiarMatriz(char mat1[4][4][1000],char mat2[4][4][1000]){
+void copiarMatriz(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX]){
 	for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
 			for(int k=0;k<30;k++){
@@ -316,7 +317,7 @@ void copiarMatriz(char mat1[4][4][1000],char mat2[4][4][1000]){
 	}
 }
 
-void envolverParentesis(char mat1[4][4][1000]){
+void envolverParentesis(char mat1[4][4][NUMCARACMAX]){
 	char temp[100];
 	for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
@@ -330,7 +331,7 @@ void envolverParentesis(char mat1[4][4][1000]){
 	}
 }
 
-void guardarMatrizenFichero(char mat1[4][4][1000]){
+void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX]){
 	FILE *fp;
 	
 	fp = fopen("MatrizDHGenerica.csv", "w+");
@@ -341,8 +342,6 @@ void guardarMatrizenFichero(char mat1[4][4][1000]){
 	} 
 	
 	fclose(fp);
-
-	
 }
 
 
