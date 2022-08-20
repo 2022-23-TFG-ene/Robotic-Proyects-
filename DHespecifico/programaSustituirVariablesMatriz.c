@@ -38,14 +38,16 @@ int main(){
 	float resultado[4][4];
 	int introduccionDatos=0;
 	
+	introduccionDatos=tipoIntroduccionDatos();
 	inicializarMatrizZeros(matrizPosFijo);
 	inicializarArrayZeros(senosycosenos);
-	printf("\nIntroduzca la forma en la que desea introducir los motores: \n");
-	printf("	- \"1\" si desea hacerlo de forma manual \n");
-	printf("	- \"2\" si desea seguir los pasos de DH \n");
-	scanf(" %d",&introduccionDatos);
 	
-	itroducirMotores(matriz);
+	if (introduccionDatos==1){
+		itroducirMotores(matriz);
+	}else if (introduccionDatos==2){
+		//itroducirMotoresDH(matriz);
+	}
+	
 	inicializarMatrizZeros(matriztem);
 	csvAMatriz(matriztem);
 	sacarListaValores(matriz,matriztem,listaValores);
@@ -55,8 +57,43 @@ int main(){
 
 }
 
+int tipoIntroduccionDatos(){
+	int introduccionDatos=0;
+	printf("\nIntroduzca la forma en la que desea introducir los motores: \n");
+	printf("	- \"1\" si desea hacerlo de forma manual \n");
+	printf("	- \"2\" si desea seguir los pasos de DH \n");
+	scanf(" %d",&introduccionDatos);
+	return introduccionDatos;
+}
+
 void itroducirMotores(float matriz[NUMMOT][4]){
 	for (int i =0;i<NUMMOT;i=i+1){
+		printf("Para introducir los datos correctamente, siga los pasos que se muestran a continuación:\n\n");
+		printf("\t0) Cree una matriz de 4 x nº de motores\n");
+		printf("\t   La primera fila representa el giro de nuestro motor desde el origen (beta)\n");
+		printf("\t   La segunda el desplazamiento en z para que coincidan los origenes (distancia entre ejes de motores) (d)\n");
+		printf("\t   La tercera el desplazamiento en x (r)\n");
+		printf("\t   La cuarta la rotación para qeu coincian los ejes z (alfa)\n");
+		printf("\t   ***T(i-2)/i=rotz(betai)*transz(di)*transx(ri)*rotx(alfai)***\n");
+		printf("\t1) Situe z0 hasta zn estando z0 en la base zn en la punta del brazo.\n");
+		printf("\t   Se debe situar las z de forma coincidente a los ejes de los motores.\n");
+		printf("\t   z0 irá en la dirección del segmento entre la base y la articulación 1\n");
+		printf("\t2) Añada x1 (está en la normal de z0 y z1)\n");
+		printf("\t   Añada x0 si es posible en la misma dirección que x1\n");
+		printf("\t   Añada hasta xn respetando la regla de la mano derecha y que x tiene que estar en la normal de zn y zn-1\n");
+		printf("\t3) Añada las y a los sistemas de coordenadas respetando la regla de la mano derecha\n");
+		printf("\t   Regla de la mano derecha:\n");
+		printf("\t   z    y          \n");
+		printf("\t   |   /           \n");
+		printf("\t   |  /            \n");
+		printf("\t   | /             \n");
+		printf("\t   . --------x     \n");
+		printf("\t4) A continuación se rellena la matriz creada como exponemos a continuación\n");
+		printf("\t   1- Rotación sobre eje z para que coincidan las x\n");
+		printf("\t   2- En d desplazamiento sobre el eje z entre ejes del motor. (distancia entre ejes teniendo en cuenta que están en un mismo plano)\n");
+		printf("\t   3- En r va el desplazamiento en x\n");
+		printf("\t   4- rotación sobre x para que coincidan ejes z\n");
+		
 		printf("Introducir Motor beta alfa r d (separado por espacios) y de forma creciente\n");
 		scanf("%f" "%f" "%f" "%f",&matriz[i][0],&matriz[i][1],&matriz[i][2],&matriz[i][3]);
 	}
