@@ -18,6 +18,7 @@ void introducimosEjesMotores(int datosMotores[NUMMOT][3],int ejes90[10]);
 void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMOT][4]);
 char cambiarNumeroSimbolo(int n);
 int cambiarSimboloNumero(char n);
+void guardarMatrizenFichero(float matriz[NUMMOT][4]);
 
 int main(){
 	int introduccionDatos=0;
@@ -43,7 +44,7 @@ int main(){
 			} 
 			printf("\n");
 	}
-	
+	guardarMatrizenFichero(matriz);
 	return 0;
 
 }
@@ -108,7 +109,6 @@ void itroducirMotoresAutomatico(float matriz[NUMMOT][4],int angulos90){
 	
 	
 	informacionMotoresAutomatico();
-	
 	introducimosEjesMotores(datosMotores,ejes90);
 	
 	for (int i=0;i<NUMMOT-1;i++){
@@ -119,7 +119,7 @@ void itroducirMotoresAutomatico(float matriz[NUMMOT][4],int angulos90){
 	}
 	
 	while (flag==0){ 
-		printf("Desea cambiar alguna x de la matriz? Cambiar si hay dos filas seguidas iguales (La x no puede ser igual que la z) y/n");
+		printf("Desea cambiar alguna x de la matriz? Cambiar si para llegar al motor i ni la xi ni zi-1 apuntan hacia el siguiente motor (La x no puede ser igual que la z) y/n");
 		scanf(" %c", &decision);
 		if (decision=='n'){
 			flag=1;
@@ -143,9 +143,6 @@ void itroducirMotoresAutomatico(float matriz[NUMMOT][4],int angulos90){
 			printf("\n");
 			}
 		}
-		
-		
-		
 	}
 	
 	
@@ -210,9 +207,9 @@ void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMO
 	scanf("%d", &distancia);
 	// beta alfa r d
 	matriz[0][0]=0;
-	matriz[0][1]=distancia;
+	matriz[0][3]=distancia;
 	matriz[0][2]=0;
-	matriz[0][3]=0;
+	matriz[0][1]=0;
 	
 	printf("A continuación se van a suceder los motores y ejes definidos anteriormente. Se deben contestar a las siguientes preguntas usando siempre la regla de la mano derecha.\n");
 	for (int i=1;i<NUMMOT-1;i++){
@@ -226,7 +223,7 @@ void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMO
 		//Desplazamiento sobre el eje z - d
 		printf("Cuanto hay que desplazarse sobre el eje z (%c) desde el elemento (%d) para llegar al siguiente elemento (%d)?\n",cambiarNumeroSimbolo(datosMotores[i-1][2]),i,i+1);
 		scanf(" %d",&distancia);
-		matriz[i][1]=distancia;
+		matriz[i][3]=distancia;
 		
 		//Desplazamiento sobre el eje x - r
 		printf("Cuanto hay que desplazarse sobre el eje x desde el elemento (%d) para llegar al siguiente elemento (%d)?\n",i,i+1);
@@ -238,7 +235,7 @@ void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMO
 		printf("El eje z %d es %c y el eje z del motor %d es %c (x es %c)\n",i , cambiarNumeroSimbolo(datosMotores[i-1][2]),i+1,cambiarNumeroSimbolo(datosMotores[i][2]),cambiarNumeroSimbolo(datosMotores[i-1][0]));
 		printf("Para llegar del z %d al z %d (sobre z) cuanto hay que girar (regla de la mano derecha)(0,90,180,-90)\n",i, i+1);
 		scanf(" %d", &giro);
-		matriz[i][3]=giro;
+		matriz[i][1]=giro;
 		giro=0;
 		
 		printf("***********************************\n\n");
@@ -370,4 +367,19 @@ void informacionMotoresAutomatico(){
 	printf("\t    | /             \n");
 	printf("\t    . --------x     \n");
 	printf("\tp2 Inicialmente colocaremos el robot de tal manera uqe los ejes de los motores esten perpendiculares o paralelos al usuario.");
+}
+
+
+
+void guardarMatrizenFichero(float matriz[NUMMOT][4]){
+	FILE *fp;
+	
+	fp = fopen("ParametrosDHespecificos.csv", "w+");
+	
+	for (int i =0;i<NUMMOT;i++){
+		//separación " / "
+		//Se guarda en otro orden para que cuadre con el siguiente programa. 
+		fprintf(fp,"%f / %f / %f / %f\n", matriz[i][0], matriz[i][3], matriz[i][2], matriz[i][1]);
+	} 
+	fclose(fp);
 }
