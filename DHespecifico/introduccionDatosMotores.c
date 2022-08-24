@@ -376,7 +376,7 @@ void guardarMatrizenFichero(float matriz[NUMMOT][4]){
 	
 	fp = fopen("ParametrosDHespecificos.csv", "w+");
 	
-	for (int i =0;i<NUMMOT;i++){
+	for (int i =0;i<NUMMOT-1;i++){
 		//separación " / "
 		//Se guarda en otro orden para que cuadre con el siguiente programa. 
 		fprintf(fp,"%f / %f / %f / %f\n", matriz[i][0], matriz[i][3], matriz[i][2], matriz[i][1]);

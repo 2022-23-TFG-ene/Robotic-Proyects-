@@ -10,7 +10,6 @@
 int NUMMOT=2;
 int NUMCARACMAX=1000; //100: válido para 2
 
-void itroducirMotores(float matriz[NUMMOT][4]);
 void csvAMatriz(char matriztem[4][4][NUMCARACMAX]);
 void inicializarMatrizZeros(char mat[4][4][NUMCARACMAX]);
 void sacarListaValores(float matriz[NUMMOT][4],char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)]);
@@ -23,11 +22,15 @@ void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX
 float postfixStringAResultado(char matrizPosFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX]);
 void inicializarArrayZeros(int cola[NUMCARACMAX]);
 int tipoIntroduccionDatos();
+void informacionMotoresAutomatico();
+int encontrarEjeY(int x, int z);
+int filasCSVParametrosDHespecificos();
+void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4]);
 //Los valores que se cambien en matriz afectarán a los valores de listaValores porque apuntan a los mismos.
 //Por lo que no es necesario crear de nuevo listaValores ya que siempre estará actualizada.
 int main(){
-	printf("Introduzca el número de motores: ");
-	scanf(" %d",&NUMMOT);
+	NUMMOT=filasCSVParametrosDHespecificos();
+	
 	float matriz[NUMMOT][4]; 
 	char matriztem[4][4][NUMCARACMAX]; 
 	char matrizPosFijo[4][4][NUMCARACMAX]; 
@@ -36,18 +39,11 @@ int main(){
 	int senosycosenos[NUMCARACMAX];//1 seno, 2 coseno. 3 -sen
 	int possenoycoseno=0;
 	float resultado[4][4];
-	int introduccionDatos=0;
 	
-	introduccionDatos=tipoIntroduccionDatos();
+	leerfilasCSVParametrosDHespecificos(matriz);
+	
 	inicializarMatrizZeros(matrizPosFijo);
 	inicializarArrayZeros(senosycosenos);
-	
-	if (introduccionDatos==1){
-		itroducirMotores(matriz);
-	}else if (introduccionDatos==2){
-		//itroducirMotoresDH(matriz);
-	}
-	
 	inicializarMatrizZeros(matriztem);
 	csvAMatriz(matriztem);
 	sacarListaValores(matriz,matriztem,listaValores);
@@ -57,47 +53,8 @@ int main(){
 
 }
 
-int tipoIntroduccionDatos(){
-	int introduccionDatos=0;
-	printf("\nIntroduzca la forma en la que desea introducir los motores: \n");
-	printf("	- \"1\" si desea hacerlo de forma manual \n");
-	printf("	- \"2\" si desea seguir los pasos de DH \n");
-	scanf(" %d",&introduccionDatos);
-	return introduccionDatos;
-}
 
-void itroducirMotores(float matriz[NUMMOT][4]){
-	for (int i =0;i<NUMMOT;i=i+1){
-		printf("Para introducir los datos correctamente, siga los pasos que se muestran a continuación:\n\n");
-		printf("\t0) Cree una matriz de 4 x nº de motores\n");
-		printf("\t   La primera fila representa el giro de nuestro motor desde el origen (beta)\n");
-		printf("\t   La segunda el desplazamiento en z para que coincidan los origenes (distancia entre ejes de motores) (d)\n");
-		printf("\t   La tercera el desplazamiento en x (r)\n");
-		printf("\t   La cuarta la rotación para qeu coincian los ejes z (alfa)\n");
-		printf("\t   ***T(i-2)/i=rotz(betai)*transz(di)*transx(ri)*rotx(alfai)***\n");
-		printf("\t1) Situe z0 hasta zn estando z0 en la base zn en la punta del brazo.\n");
-		printf("\t   Se debe situar las z de forma coincidente a los ejes de los motores.\n");
-		printf("\t   z0 irá en la dirección del segmento entre la base y la articulación 1\n");
-		printf("\t2) Añada x1 (está en la normal de z0 y z1)\n");
-		printf("\t   Añada x0 si es posible en la misma dirección que x1\n");
-		printf("\t   Añada hasta xn respetando la regla de la mano derecha y que x tiene que estar en la normal de zn y zn-1\n");
-		printf("\t3) Añada las y a los sistemas de coordenadas respetando la regla de la mano derecha\n");
-		printf("\t   Regla de la mano derecha:\n");
-		printf("\t   z    y          \n");
-		printf("\t   |   /           \n");
-		printf("\t   |  /            \n");
-		printf("\t   | /             \n");
-		printf("\t   . --------x     \n");
-		printf("\t4) A continuación se rellena la matriz creada como exponemos a continuación\n");
-		printf("\t   1- Rotación sobre eje z para que coincidan las x\n");
-		printf("\t   2- En d desplazamiento sobre el eje z entre ejes del motor. (distancia entre ejes teniendo en cuenta que están en un mismo plano)\n");
-		printf("\t   3- En r va el desplazamiento en x\n");
-		printf("\t   4- rotación sobre x para que coincidan ejes z\n");
-		
-		printf("Introducir Motor beta alfa r d (separado por espacios) y de forma creciente\n");
-		scanf("%f" "%f" "%f" "%f",&matriz[i][0],&matriz[i][1],&matriz[i][2],&matriz[i][3]);
-	}
-}
+
 
 void csvAMatriz(char matriztem[4][4][NUMCARACMAX]){
 	char buffer[1024];
@@ -122,7 +79,7 @@ void csvAMatriz(char matriztem[4][4][NUMCARACMAX]){
 		j=0;
 		i++ ;
 	}
-	
+	fclose(pfichero);
 	printf("MATRIZ\n");
 	int a =0;
 	int b=0;
@@ -132,6 +89,7 @@ void csvAMatriz(char matriztem[4][4][NUMCARACMAX]){
 		}	
 		printf("\n\n\n");
 	}
+	
 }
 
 
@@ -457,5 +415,59 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 }
 
 
+int filasCSVParametrosDHespecificos(){
+    FILE *fichero;
+    int lineas = 0;
+    char chr;
+    fichero = fopen("ParametrosDHespecificos.csv", "r");
+    if(fichero==NULL){
+		printf("No se ha encontrado el archivo ParametrosDHespecificos\n");
+		exit(0);
+	}
+    chr = getc(fichero);
+    while (chr != EOF){
+        if (chr == '\n'){
+            lineas = lineas+1;
+        }
+        chr = getc(fichero);
+    }
+    fclose(fichero); 
+    printf("Hay %d elementos\n", lineas);
+    return lineas;
+}
 
+void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4]){
+	char buffer[100];
+	
+	char *record,*line;
+	int i=0,j=0;
+	FILE *pfichero = fopen("ParametrosDHespecificos.csv","r");
+	
+	if(pfichero == NULL){
+      printf("\n No se ha podido abrir el fichero ");
+      exit(0);
+	}
+	
+	while(line=fgets(buffer,sizeof(buffer),pfichero)){
+		record = strtok(line,"/");
+		while(record != NULL){
+			matriz[i][j]=atoi(record) ;
+			record = strtok(NULL,"/");
+			j++;
+		}
+		j=0;
+		i++ ;
+	}
+	fclose(pfichero);
+	printf("MATRIZ*****************\n");
+	int a =0;
+	int b=0;
+	for (a=0;a<NUMMOT;a++){
+		for(b=0;b<4;b++){
+			printf("%f           " ,matriz[a][b]);
+		}	
+		printf("\n\n\n");
+	}
+	
+}
 
