@@ -8,7 +8,7 @@
 
 
 int NUMMOT=2;
-int NUMCARACMAX=1000; //100: válido para 2
+int NUMCARACMAX=100000; //100: válido para 2
 int CONTADOR=0;
 float PI = 3.14159265358979323846;
 
@@ -379,14 +379,14 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 			//Pasamos los ángulos de grados a radiantes para aplicar las funciones matemáticas.
 			if(senosycosenos[posicionListaValores]==1){
 				printf("Estamos en seno\n");
-				printf("El valor es %f, el original es %f \n",sin(*listaValores[posicionListaValores]*(PI/180))*(180/PI) , *listaValores[posicionListaValores]);
-				pila[posicionPila]=sin(*listaValores[posicionListaValores]*(PI/180))*(180/PI);//Las funciones sin y cos se hacen en radianes por eso el doble cambio, lo redondeamso porque no da 0 ni los valores exactos
+				printf("El valor es %f, el original es %f \n",sin(*listaValores[posicionListaValores]*(PI/180)) , *listaValores[posicionListaValores]);
+				pila[posicionPila]=sin(*listaValores[posicionListaValores]*(PI/180));//Las funciones sin y cos se hacen en radianes por eso el doble cambio, lo redondeamso porque no da 0 ni los valores exactos
 				//printf("SENO-------%f",pila[posicionPila]);
 			}
 			if(senosycosenos[posicionListaValores]==2){
 				printf("Estamos en coseno\n");
-				printf("El valor es %f , el original es %f \n",cos(*listaValores[posicionListaValores]*(PI/180))*(180/PI) , *listaValores[posicionListaValores]);
-				pila[posicionPila]=cos(*listaValores[posicionListaValores]*(PI/180))*(180/PI);
+				printf("El valor es %f , el original es %f \n",cos(*listaValores[posicionListaValores]*(PI/180)), *listaValores[posicionListaValores]);
+				pila[posicionPila]=cos(*listaValores[posicionListaValores]*(PI/180));
 				printf("posicionListaValores: %d\n",posicionListaValores);
 				printf("listaValores: %f\n",*listaValores[posicionListaValores]);
 				//printf("COSENO-------%f",pila[posicionPila]);
@@ -394,8 +394,8 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 			}
 			if(senosycosenos[posicionListaValores]==3){
 				printf("Estamos en -seno \n");
-				printf("El valor es %f , el original es %f \n",-sin(*listaValores[posicionListaValores]*(PI/180))*(180/PI) , *listaValores[posicionListaValores]);
-				pila[posicionPila]=-sin(*listaValores[posicionListaValores]*(PI/180))*(180/PI);
+				printf("El valor es %f , el original es %f \n",-sin(*listaValores[posicionListaValores]*(PI/180)) , *listaValores[posicionListaValores]);
+				pila[posicionPila]=-sin(*listaValores[posicionListaValores]*(PI/180));
 				//printf("-SENO-------%f",pila[posicionPila]);
 			}
 			
