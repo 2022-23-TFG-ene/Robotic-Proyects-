@@ -25,7 +25,7 @@ int main(){
 	int angulos90=0;
 	printf("el número de veces que para llegar de un motor a otro, te tienes que desplazar en más de dos sentidos respecto a los ejes de coordenadas de la base\n ");
 	scanf("%d",&angulos90);	
-	printf("Introduzca el número de motores + el número de ángulos de 90º entre ejes de motores: ");
+	printf("Introduzca el número de motores ");
 	scanf(" %d",&NUMMOT);
 	NUMMOT=NUMMOT+angulos90;
 	float matriz[NUMMOT][4];
@@ -38,7 +38,7 @@ int main(){
 		itroducirMotoresAutomatico(matriz,angulos90);
 	}
 	
-	for (int i=0;i<NUMMOT-1;i++){
+	for (int i=0;i<NUMMOT;i++){
 		for (int j=0;j<4;j++){
 				printf("%f      ",matriz[i][j]);
 			} 
@@ -111,7 +111,7 @@ void itroducirMotoresAutomatico(float matriz[NUMMOT][4],int angulos90){
 	informacionMotoresAutomatico();
 	introducimosEjesMotores(datosMotores,ejes90);
 	
-	for (int i=0;i<NUMMOT-1;i++){
+	for (int i=0;i<NUMMOT;i++){
 		for (int j=0;j<3;j++){
 				printf("%c      ",cambiarNumeroSimbolo(datosMotores[i][j]));
 			} 
@@ -136,7 +136,7 @@ void itroducirMotoresAutomatico(float matriz[NUMMOT][4],int angulos90){
 			
 			datosMotores[fila-1][1]=cambiarNumeroSimbolo(encontrarEjeY(cambiarSimboloNumero(valor),datosMotores[fila-1][2]));
 			
-			for (int m=0;m<NUMMOT-1;m++){
+			for (int m=0;m<NUMMOT;m++){
 				for (int n=0;n<3;n++){
 					printf("%c      ",cambiarNumeroSimbolo(datosMotores[m][n]));
 				} 
@@ -156,7 +156,7 @@ void introducimosEjesMotores(int datosMotores[NUMMOT][3],int ejes90[10]){
 	int sentido=0;
 	int noMotor=0;
 	//colocamos las z
-	for (int i=1;i<NUMMOT;i++){
+	for (int i=1;i<=NUMMOT;i++){
 		if(ejes90[noMotor]-1==i-1){ //Cuando no es un motor
 			printf("El elememnto a analizar no es un motor:\n");
 			printf("El eje conecta dos motores, indique el sentido y dirección del segmento que une el vertice con el segundo motor\n");
@@ -212,7 +212,7 @@ void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMO
 	matriz[0][1]=0;
 	
 	printf("A continuación se van a suceder los motores y ejes definidos anteriormente. Se deben contestar a las siguientes preguntas usando siempre la regla de la mano derecha.\n");
-	for (int i=1;i<NUMMOT-1;i++){
+	for (int i=1;i<NUMMOT;i++){
 		//Giro sobre z para que coincida x - Beta
 		printf("Estamos en el elemento %d empezando por la base.\n",i+1);
 		printf("El eje x %d es %c y el eje x del motor %d es %c\n",i , cambiarNumeroSimbolo(datosMotores[i-1][0]),i+1,cambiarNumeroSimbolo(datosMotores[i][0]));
@@ -243,7 +243,6 @@ void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMO
 }
 
 char cambiarNumeroSimbolo(int n){
-	//printf("Entraaaaaaaaaaaaaa1 %d\n",n);
 	switch(n){
 			case 1:
 				return '<';
@@ -261,7 +260,6 @@ char cambiarNumeroSimbolo(int n){
 }
 
 int cambiarSimboloNumero(char n){
-	//printf("Entraaaaaaaaaaaaaa2, %c \n",n);
 	switch(n){
 			case '<':
 				return 1;
@@ -282,7 +280,6 @@ int cambiarSimboloNumero(char n){
 //tambien sirve para sacar la x si mentemos la z del 2 motor y la z del primer motor en ese orden. 
 int encontrarEjeY(int x, int z){
 	// x y z (< izquierda 1,> derecha 2,^ arriba 3,v abajo 4,. hacia el usuario 5,x hacia el fondo 6)
-	//printf("Entraaaaaaaaaaaaaaaaaaaa3, %d - %d\n", x,z);
 	switch(x){
 		case 1:
 			switch(z){
@@ -376,10 +373,10 @@ void guardarMatrizenFichero(float matriz[NUMMOT][4]){
 	
 	fp = fopen("ParametrosDHespecificos.csv", "w+");
 	
-	for (int i =0;i<NUMMOT-1;i++){
+	for (int i =0;i<NUMMOT;i++){
 		//separación " / "
-		//Se guarda en otro orden para que cuadre con el siguiente programa. 
-		fprintf(fp,"%f / %f / %f / %f\n", matriz[i][0], matriz[i][3], matriz[i][2], matriz[i][1]);
+		//Se guarda en otro orden para que cuadre con el siguiente programa. B A r d
+		fprintf(fp,"%f / %f / %f / %f\n", matriz[i][0], matriz[i][1], matriz[i][2], matriz[i][3]);
 	} 
 	fclose(fp);
 }

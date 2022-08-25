@@ -324,6 +324,7 @@ void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX
 		for(int p=0;p<4;p++){
 			printf("%f	",resultado[o][p]);
 		}
+		printf("\n");
 	}
 	
 }
@@ -368,12 +369,12 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 			//Pasamos los ángulos de grados a radiantes para aplicar las funciones matemáticas.
 			if(senosycosenos[posicionListaValores]==1){
 				printf("Estamos en seno\n");
-				pila[posicionPila]=sin(*listaValores[posicionListaValores]*(3.141592/180));//*(3.141592/180)
+				pila[posicionPila]=sin(*listaValores[posicionListaValores]);//*(3.141592/180)
 				//printf("SENO-------%f",pila[posicionPila]);
 			}
 			if(senosycosenos[posicionListaValores]==2){
 				printf("Estamos en coseno\n");
-				pila[posicionPila]=cos(*listaValores[posicionListaValores]*(3.141592/180));
+				pila[posicionPila]=cos(*listaValores[posicionListaValores]);
 				printf("posicionListaValores: %d\n",posicionListaValores);
 				printf("listaValores: %f\n",*listaValores[posicionListaValores]);
 				//printf("COSENO-------%f",pila[posicionPila]);
@@ -381,7 +382,7 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 			}
 			if(senosycosenos[posicionListaValores]==3){
 				printf("Estamos en -seno\n");
-				pila[posicionPila]=-sin(*listaValores[posicionListaValores]*(3.141592/180));
+				pila[posicionPila]=-sin(*listaValores[posicionListaValores]);
 				//printf("-SENO-------%f",pila[posicionPila]);
 			}
 			posicionPila++;
@@ -459,7 +460,7 @@ void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4]){
 		i++ ;
 	}
 	fclose(pfichero);
-	printf("MATRIZ*****************\n");
+	printf("MATRIZ datos DH obtenidos del CSV\n");
 	int a =0;
 	int b=0;
 	for (a=0;a<NUMMOT;a++){
