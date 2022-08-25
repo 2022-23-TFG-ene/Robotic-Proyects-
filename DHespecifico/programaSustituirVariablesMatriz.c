@@ -9,6 +9,8 @@
 
 int NUMMOT=2;
 int NUMCARACMAX=1000; //100: válido para 2
+int CONTADOR=0;
+float PI = 3.14159265358979323846;
 
 void csvAMatriz(char matriztem[4][4][NUMCARACMAX]);
 void inicializarMatrizZeros(char mat[4][4][NUMCARACMAX]);
@@ -216,6 +218,14 @@ int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARAC
 				i=i+5;
 				possenoycoseno++;
 			}
+			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////NUEVO
+			if(expresion[i]== 'r'||expresion[i]== 'd'){
+				senosycosenos[possenoycoseno]=4;//4
+				i=i+1;
+				possenoycoseno++;
+			}
+			
+			
 			posicionlistaValores++;
 			posicioncola++;//hacer en el resto para marcar posicion de cola distinta de posicion de listaValores
 			
@@ -231,8 +241,8 @@ int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARAC
 				if (posicionpila<0){
 					break;
 				}
-				if(pila[posicionpila]== '('){ //Esto es infinito
-					pila[posicionpila]='0'; //Esto no lo hace bien 
+				if(pila[posicionpila]== '('){ 
+					pila[posicionpila]='0'; 
 					posicionpila--;
 					break;
 				}
@@ -246,7 +256,7 @@ int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARAC
         }
         
         else{
-            while(prioridad(pila[posicionpila]) >= prioridad(expresion[i])){//Esto también da infinito
+            while(prioridad(pila[posicionpila]) >= prioridad(expresion[i])){
 				if(pila[posicionpila]=='('){
 						break;
 					}
@@ -333,9 +343,9 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 	int resultadoTemporal=0;
 	float pila[strlen(arrayPostFijo)];//Será más pequeño siempre que el número de elementos que haya.
 	int posicionPila=0;
-	int posicionListaValores=0;
+	int posicionListaValores=CONTADOR;
 	float temporal1=0,temporal2=0;
-	
+
 	if(arrayPostFijo[0]=='\0'){
 		return 0;
 	}
@@ -364,27 +374,38 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 		printf("\n\n");
 		
 		if (arrayPostFijo[i]=='2'){
-			printf("Es 2\n");
+			printf("Es 2, u el valor del arrayPostFijo %d y el valor es %d\n",posicionListaValores,senosycosenos[posicionListaValores]);
 			//seno 1 coseno 2 -seno 3
 			//Pasamos los ángulos de grados a radiantes para aplicar las funciones matemáticas.
 			if(senosycosenos[posicionListaValores]==1){
 				printf("Estamos en seno\n");
-				pila[posicionPila]=sin(*listaValores[posicionListaValores]);//*(3.141592/180)
+				printf("El valor es %f, el original es %f \n",sin(*listaValores[posicionListaValores]*(PI/180))*(180/PI) , *listaValores[posicionListaValores]);
+				pila[posicionPila]=sin(*listaValores[posicionListaValores]*(PI/180))*(180/PI);//Las funciones sin y cos se hacen en radianes por eso el doble cambio, lo redondeamso porque no da 0 ni los valores exactos
 				//printf("SENO-------%f",pila[posicionPila]);
 			}
 			if(senosycosenos[posicionListaValores]==2){
 				printf("Estamos en coseno\n");
-				pila[posicionPila]=cos(*listaValores[posicionListaValores]);
+				printf("El valor es %f , el original es %f \n",cos(*listaValores[posicionListaValores]*(PI/180))*(180/PI) , *listaValores[posicionListaValores]);
+				pila[posicionPila]=cos(*listaValores[posicionListaValores]*(PI/180))*(180/PI);
 				printf("posicionListaValores: %d\n",posicionListaValores);
 				printf("listaValores: %f\n",*listaValores[posicionListaValores]);
 				//printf("COSENO-------%f",pila[posicionPila]);
 
 			}
 			if(senosycosenos[posicionListaValores]==3){
-				printf("Estamos en -seno\n");
-				pila[posicionPila]=-sin(*listaValores[posicionListaValores]);
+				printf("Estamos en -seno \n");
+				printf("El valor es %f , el original es %f \n",-sin(*listaValores[posicionListaValores]*(PI/180))*(180/PI) , *listaValores[posicionListaValores]);
+				pila[posicionPila]=-sin(*listaValores[posicionListaValores]*(PI/180))*(180/PI);
 				//printf("-SENO-------%f",pila[posicionPila]);
 			}
+			
+			//////////////////////////////////////////////////////////////////////////////////////////NUEVO caso r y caso d
+			if(senosycosenos[posicionListaValores]==4){
+				printf("Estamos en R o D*************************************************************************************************************************************************\n");
+				pila[posicionPila]=*listaValores[posicionListaValores];
+				//printf("R o D-------%f",pila[posicionPila]);
+			}
+			
 			posicionPila++;
 			posicionListaValores++;	
 		}
@@ -412,6 +433,7 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 	}
 	printf("\n\n");
 	printf("-------RESULTADOS: %f",pila[0]);
+	CONTADOR=posicionListaValores;
 	return pila[0];
 }
 
