@@ -61,6 +61,7 @@ int main(){
 		}
 		guardarMatrizenFichero(matriz);
 	}else{
+		float matriz[NUMMOT][4];
 		importarDatosCSV();
 	}
 	
@@ -239,6 +240,7 @@ void introducimosEjesMotores(int datosMotores[NUMMOT][3],int ejes90[10]){
 void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMOT][4],FILE *datosCSV){
 	int distancia=0;
 	int giro=0;
+	char temporal[10];
 	
 	datosCSV = fopen("DatosMotoresModificables.csv", "a+");	
 	fprintf(datosCSV,"**************************************************\n");
@@ -267,6 +269,7 @@ void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMO
 		printf("Cuanto hay que desplazarse sobre el eje z (%c) desde el elemento (%d) para llegar al siguiente elemento (%d)?\n",cambiarNumeroSimbolo(datosMotores[i-1][2]),i,i+1);
 		fprintf(datosCSV,"Cuanto hay que desplazarse sobre el eje z (%c) desde el elemento (%d) para llegar al siguiente elemento (%d)?\n",cambiarNumeroSimbolo(datosMotores[i-1][2]),i,i+1);
 		scanf(" %d",&distancia);
+		//sprintf(temporal,"%d",distancia);
 		fprintf(datosCSV,"\t-VALOR: %d\n",distancia);
 		matriz[i][3]=distancia;
 		
@@ -471,21 +474,59 @@ void cambiarValoresdatosMotores(int datosMotores[NUMMOT][3]){
 	}
 }
 
+
 void importarDatosCSV(){
-	//NUMMOT=
-	FILE* fichero = fopen("DatosMotoresModificables", "r");
-	char fila[100];
-	int temporal=0;
+	float matriz[10][4];	
+	char *record,*line;
+	char buffer[1024];
+	int i=0,j=0;
 	int sumaEjes=0;
 	int contador=0;
-	while (feof(fichero) != true)
-    {
-        fgets(fila, 100, fichero);
-        //printf("fila: %s", fila);
-        if (contador==1){
-				temporal=strtok(fila,"/");
-				temporal=temporal+strtok(fila,"/");
+	FILE *pfichero = fopen("DatosMotoresModificables.csv","r");
+	
+	if(pfichero == NULL){
+      printf("\n No se ha podido abrir el fichero ");
+      exit(0);
+	}
+	
+	while(line=fgets(buffer,sizeof(buffer),pfichero)){
+		if (contador==1){
+			record = strtok(line,"/");
+			while(record != NULL){
+				printf("RECORD %s\n",record);
+				sumaEjes=sumaEjes+atoi(record);
+				record = strtok(NULL,"/");
+			}
 		}
-        contador=contador+1;
-    }
+		contador++;
+		if(contador>2){
+			if (strstr(line,"VALOR:")){
+
+				record = strtok(line,":");
+				record = strtok(NULL,":");
+				
+				//printf("record 2 es %s\n",record);
+				matriz[i][j]=atoi(record);
+				
+				if(j==3){
+					j=0;
+					i++;
+				}else{
+					j++;
+				}
+				
+			}
+		}	
+	}
+	
+	fclose(pfichero);
+	printf("SUMA %d\n", sumaEjes);
+	for (int k=0;k<sumaEjes;k++){
+		for (int l=0;l<4;l++){
+			printf("%f      ",matriz[k][l]);
+		} 
+		printf("\n");
+	}
 }
+
+
