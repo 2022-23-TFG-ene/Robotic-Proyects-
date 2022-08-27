@@ -4,24 +4,26 @@
 #include<stdlib.h>
 #include<string.h>
 
-int NUMCARACMAX=100000;
+int NUMCARACMAX=10000;
 char  matriz[4][10][10];
  
 int datosIniciales();
 void AnadirMotor(int fila);
-void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX]);
+void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i);
 void multiply(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX],char mul[4][4][NUMCARACMAX]);
 void inicializarMatrizIdentidad(char mat1[4][4][NUMCARACMAX]);
 void copiarMatriz(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX]);
 void inicializarMatrizZeros(char mat1[4][4][NUMCARACMAX]);
 void envolverParentesis(char mat1[4][4][NUMCARACMAX]);
-void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX]);
+void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX], int i);
+void matrizInversa(char mat1[4][4][NUMCARACMAX], int i);
+void multiplicarYGuardarCSVMatricesInversas(int tamano);
 
 
 int main(){
 	char matrizFinal[4][4][NUMCARACMAX];
 	int tamano=0;
-	
+	int i=0;
 	printf("************************************************************\n");
 	printf("* Este programa crea la matriz de DH de los motores que    *\n");
 	printf("* indique el usuario.                                      *\n");
@@ -33,9 +35,11 @@ int main(){
 	printf("************************************************************\n");
 	
 	tamano=datosIniciales();
-	calculaMatrizDH(tamano,matrizFinal);
-	guardarMatrizenFichero(matrizFinal);
-return 0;
+	for(int i=0; i<tamano; i++){
+		calculaMatrizDH(tamano,matrizFinal,i);
+		guardarMatrizenFichero(matrizFinal,i);
+	}
+	multiplicarYGuardarCSVMatricesInversas(tamano);
 }
 
 int datosIniciales(){
@@ -43,10 +47,11 @@ int datosIniciales(){
 	int nmotores=0;
 	printf("Introduzca el número de motores con los que desea trabajar: ");
 	scanf(" %d",&nmotores);
+	
 	for (int i=0;i<nmotores;i++){
 		for (int j=0;j<4;j++){
+			//Valores que definen como se van a llamar nuestras variables
 			if (j==0){
-				//strcpy(matriz[i][j],"b");
 				sprintf(matriz[i][j], "b%d",i+1);
 			}
 			if (j==1){
@@ -72,7 +77,7 @@ void AnadirMotor(int fila){
 }
 */
 
-void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX]){
+void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i){
 	
 	//numero de elementos, filas, columnas
 	
@@ -96,7 +101,7 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX]){
 	inicializarMatrizZeros(matrizFinal);
 
 	char strtemp[10]="";
-	for(int i=0;i<filasusadas;i++){ 
+	for(i;i<filasusadas;i++){ 
 		//Inicialización
 		inicializarMatrizIdentidad(matriztem1);
 		inicializarMatrizIdentidad(matriztem2);
@@ -211,7 +216,7 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX]){
 
 }
 
-//Multiplica dos matrices y devuelve la matriz resultante. 
+//Multiplica dos matrices y devuelve la matriz resultante. (mat1*mat2=mul)
 void multiply(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX],char mul[4][4][NUMCARACMAX]){
 	char temporal[NUMCARACMAX];
     for(int i=0;i<4;i++){
@@ -307,6 +312,7 @@ void inicializarMatrizZeros(char mat1[4][4][NUMCARACMAX]){
 	}
 }
 
+//Copia la matriz 2 en la 1
 void copiarMatriz(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX]){
 	for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
@@ -331,22 +337,146 @@ void envolverParentesis(char mat1[4][4][NUMCARACMAX]){
 	}
 }
 
-void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX]){
-	FILE *fp;
-	
-	fp = fopen("MatrizDHGenerica.csv", "w+");
-	
-	for (int i =0;i<4;i++){
-		//separación " / "
-		fprintf(fp,"%s / %s / %s / %s\n", mat1[i][0], mat1[i][1], mat1[i][2], mat1[i][3]);
-	} 
-	
-	fclose(fp);
+void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX], int i){
+	char temporal[5];
+	char nombre[20];
+	if(i==0){
+		FILE *fp;
+		fp = fopen("MatrizDHGenerica.csv", "w+");
+		for (int i =0;i<4;i++){
+			//separación " / "
+			fprintf(fp,"%s / %s / %s / %s\n", mat1[i][0], mat1[i][1], mat1[i][2], mat1[i][3]);
+		} 
+		fclose(fp);
+	}else{
+		sprintf(temporal,"%d",i);
+		strcpy(nombre,"MatrizNormal-");
+		strcat(nombre,temporal);
+		
+		FILE *fp;
+		fp = fopen(nombre, "w+");
+		for (int i =0;i<4;i++){
+			//separación " / "
+			fprintf(fp,"%s / %s / %s / %s\n", mat1[i][0], mat1[i][1], mat1[i][2], mat1[i][3]);
+		} 
+		fclose(fp);
+	}
 }
 
 
+void matrizInversa(char mat1[4][4][NUMCARACMAX], int i){
+	char temporal[5];
+	sprintf(temporal,"%d",i);
+	//[0][0]
+	strcpy(mat1[0][0],"c(b");
+	strcat(mat1[0][0],temporal);
+	strcat(mat1[0][0],")");
+	//[0][1]
+	strcpy(mat1[0][1],"s(b");
+	strcat(mat1[0][1],temporal);
+	strcat(mat1[0][1],")");
+	//[0][2]
+	strcpy(mat1[0][2],"0");
+	//[0][3]
+	strcpy(mat1[0][3],"(-r");
+	strcat(mat1[0][3],temporal);
+	strcat(mat1[0][3],")");	
+	//[1][0]
+	strcpy(mat1[1][0],"c(a");
+	strcat(mat1[1][0],temporal);
+	strcat(mat1[1][0],")*");
+	strcat(mat1[1][0],"(-s(b");
+	strcat(mat1[1][0],temporal);
+	strcat(mat1[1][0],"))");
+	//[1][1]
+	strcpy(mat1[1][1],"c(a");
+	strcat(mat1[1][1],temporal);
+	strcat(mat1[1][1],")*");
+	strcat(mat1[1][1],"c(b");
+	strcat(mat1[1][1],temporal);
+	strcat(mat1[1][1],")");
+	//[1][2]
+	strcpy(mat1[1][2],"s(a");
+	strcat(mat1[1][2],temporal);
+	strcat(mat1[1][2],")");
+	//[1][3]
+	strcpy(mat1[1][3],"(-d");
+	strcat(mat1[1][3],temporal);
+	strcat(mat1[1][3],"*s(a");
+	strcat(mat1[1][3],temporal);
+	strcat(mat1[1][3],"))");
+	//[2][0]
+	strcpy(mat1[2][0],"s(a");
+	strcat(mat1[2][0],temporal);
+	strcat(mat1[2][0],")*");
+	strcat(mat1[2][0],"s(b");
+	strcat(mat1[2][0],temporal);
+	strcat(mat1[2][0],")");
+	//[2][1]
+	strcpy(mat1[2][1],"(-s(a");
+	strcat(mat1[2][1],temporal);
+	strcat(mat1[2][1],"))*");
+	strcat(mat1[2][1],"c(b");
+	strcat(mat1[2][1],temporal);
+	strcat(mat1[2][1],")");
+	//[2][2]
+	strcpy(mat1[2][2],"c(a");
+	strcat(mat1[2][2],temporal);
+	strcat(mat1[2][2],")");
+	//[2][3]
+	strcpy(mat1[2][3],"(-d");
+	strcat(mat1[2][3],temporal);
+	strcat(mat1[2][3],"*s(a");
+	strcat(mat1[2][3],temporal);
+	strcat(mat1[2][3],"))");
+	//[3][0]
+	strcpy(mat1[3][0],"0");
+	//[3][0]
+	strcpy(mat1[3][1],"0");
+	//[3][0]
+	strcpy(mat1[3][2],"0");
+	//[3][0]
+	strcpy(mat1[3][3],"1");
+}
 
 
+void multiplicarYGuardarCSVMatricesInversas(int tamano){
+	char matrizI[4][4][NUMCARACMAX];
+	char matrizItem[4][4][NUMCARACMAX];
+	char matrizItem2[4][4][NUMCARACMAX];
+	char temporal[5];
+	char nombre[20];
+	
+	if(tamano>=1){
+		matrizInversa(matrizI,1);
+		FILE *fp;
+		fp = fopen("MatrizInversa-1.csv", "w+");
+		for (int i =0;i<4;i++){
+			//separación " / "
+			fprintf(fp,"%s / %s / %s / %s\n", matrizI[i][0], matrizI[i][1], matrizI[i][2], matrizI[i][3]);
+		}	 
+		fclose(fp);
+	}
+	
+	for (int j=2;j<=tamano;j++){
+		matrizInversa(matrizItem,j);
+		inicializarMatrizZeros(matrizItem2);
+		multiply(matrizI,matrizItem,matrizItem2);
+		copiarMatriz(matrizI,matrizItem2);
+		FILE *fp;
+		
+		sprintf(temporal,"%d",j);
+		strcpy(nombre,"MatrizInversa-");
+		strcat(nombre,temporal);
+		
+		fp = fopen(nombre, "w+");
+		for (int a =0;a<4;a++){
+			//separación " / "
+			fprintf(fp,"%s / %s / %s / %s\n", matrizI[a][0], matrizI[a][1], matrizI[a][2], matrizI[a][3]);
+			}	 
+		fclose(fp);
+	}
+}
 
 
 

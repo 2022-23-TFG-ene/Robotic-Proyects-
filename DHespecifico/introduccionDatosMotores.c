@@ -61,13 +61,9 @@ int main(){
 		}
 		guardarMatrizenFichero(matriz);
 	}else{
-		float matriz[NUMMOT][4];
 		importarDatosCSV();
 	}
-	
-	
 	return 0;
-
 }
 
 int tipoIntroduccionDatos(){
@@ -128,8 +124,7 @@ void itroducirMotoresAutomatico(float matriz[NUMMOT][4],int angulos90,FILE *dato
 		scanf("%d",&temporal);
 		ejes90[i]=temporal;
 	}
-	
-	
+		
 	informacionMotoresAutomatico();
 	introducimosEjesMotores(datosMotores,ejes90);
 	
@@ -177,8 +172,6 @@ void itroducirMotoresAutomatico(float matriz[NUMMOT][4],int angulos90,FILE *dato
 		fprintf(datosCSV,"%c / %c / %c\n",cambiarNumeroSimbolo(datosMotores[n][0]),cambiarNumeroSimbolo(datosMotores[n][1]),cambiarNumeroSimbolo(datosMotores[n][2]));
 	}
 	fclose(datosCSV);
-	
-	
 	introducirDatosMatrizMotores(datosMotores,matriz,datosCSV);
 }
 
@@ -188,6 +181,7 @@ void introducimosEjesMotores(int datosMotores[NUMMOT][3],int ejes90[10]){
 	int temp=0;
 	int sentido=0;
 	int noMotor=0;
+	
 	//colocamos las z
 	for (int i=1;i<=NUMMOT;i++){
 		if(ejes90[noMotor]-1==i-1){ //Cuando no es un motor
@@ -211,6 +205,7 @@ void introducimosEjesMotores(int datosMotores[NUMMOT][3],int ejes90[10]){
 			}
 		}
 	}
+	
 	//colocamos las x
 	for (int i=1;i<=NUMMOT;i++){
 		if (i==1){
@@ -230,11 +225,11 @@ void introducimosEjesMotores(int datosMotores[NUMMOT][3],int ejes90[10]){
 			}
 		}
 	}
+	
 	//colocamos las y
 	for (int i=1;i<=NUMMOT;i++){
 		datosMotores[i-1][1]=encontrarEjeY(datosMotores[i-1][0],datosMotores[i-1][2]);
 	}
-	// x y z (< izquierda 1,> derecha 2,^ arriba 3,v abajo 4,. hacia el usuario 5,x hacia el fondo 6)
 }
 
 void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMOT][4],FILE *datosCSV){
@@ -265,6 +260,7 @@ void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMO
 		fprintf(datosCSV,"\t-VALOR: %d\n",giro);
 		matriz[i][0]=giro;
 		giro=0;
+		
 		//Desplazamiento sobre el eje z - d
 		printf("Cuanto hay que desplazarse sobre el eje z (%c) desde el elemento (%d) para llegar al siguiente elemento (%d)?\n",cambiarNumeroSimbolo(datosMotores[i-1][2]),i,i+1);
 		fprintf(datosCSV,"Cuanto hay que desplazarse sobre el eje z (%c) desde el elemento (%d) para llegar al siguiente elemento (%d)?\n",cambiarNumeroSimbolo(datosMotores[i-1][2]),i,i+1);
@@ -294,10 +290,8 @@ void introducirDatosMatrizMotores(int datosMotores[NUMMOT][3],float matriz[NUMMO
 		matriz[i][1]=giro;
 		giro=0;
 		
-		printf("***********************************\n\n");
-		
+		printf("***********************************\n\n");	
 	}
-	
 	fclose(datosCSV);
 }
 
@@ -513,8 +507,7 @@ void importarDatosCSV(){
 					i++;
 				}else{
 					j++;
-				}
-				
+				}		
 			}
 		}	
 	}
