@@ -1,3 +1,11 @@
+/**
+ * @file denavit_hatemberg.c
+ * @author Jaime Sáiz de la Peña
+ * @brief Este programa crea tanto la matriz de DH Genérica como las distintas 
+ * matrices inversas que se necesitan para calcular la cinemática inversa mediante
+ * DH. Además realiza la multiplicación de las mismas y las guarda en CSVs.
+ */
+
 #include<stdio.h>
 #include<stdbool.h>
 #include<math.h>
@@ -21,9 +29,9 @@ void multiplicarYGuardarCSVMatricesInversas(int tamano);
 
 
 int main(){
-	char matrizFinal[4][4][NUMCARACMAX];
-	int tamano=0;
-	int i=0;
+	char matrizFinal[4][4][NUMCARACMAX];  //Matriz final o parcial de DH a guardar en un CSV
+	int tamano=0;						  //Numero de motores/ejes de coordenadas de nuestro problema
+	int i=0;							  //Variable temporal
 	printf("************************************************************\n");
 	printf("* Este programa crea la matriz de DH de los motores que    *\n");
 	printf("* indique el usuario.                                      *\n");
@@ -42,9 +50,19 @@ int main(){
 	multiplicarYGuardarCSVMatricesInversas(tamano);
 }
 
+
+/**
+* @fn int datosIniciales()
+* @brief Pide al usuario que introduzca el número de motores con los que se
+* desea crear las matrices. Asigna los nombres de las variables de dicha matriz.
+* Se recomienda no cambiarlos si se desea trabajar con introduccionDatosMotores.c
+* y con programaSustituirVariables.c
+* @param -
+* @return Devuelve el número de motores con los que se va a trabajar.
+*/
 int datosIniciales(){
-	char temporal [1]="";
-	int nmotores=0;
+	char temporal [1]="";         //String temporal
+	int nmotores=0;				  //Numero de motores/ejes de coordenadas de nuestro problema
 	printf("Introduzca el número de motores con los que desea trabajar: ");
 	scanf(" %d",&nmotores);
 	
@@ -68,29 +86,27 @@ int datosIniciales(){
 	return nmotores;
 }
 
-//Esta función lo que hará será añadir Motores a la secuencia de motores y Segmentos
-//de forma manual (sustituiría a datosIniciales que lo hace de forma automática)
-/*
-void AnadirMotor(int fila){
-	printf("Introducir Motor beta alfa r d (separado por espacios)\n");
-	scanf("%s" "%s" "%s" "%s",matriz[fila][0],matriz[fila][1],matriz[fila][2],matriz[fila][3] );
-}
+/**
+* @fn void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i)
+* @brief Crea las 4 matrices que forman la matriz final de cada motor. Multiplica los
+* motores resultantes creando la matriz final de DH que guarda en un CSV. Crea también 
+* las matrices parciales que se usan para sacar las ecuaciones en cinamática inversa.  
+* @param int i: marca si se crea la matriz de DH o las matrices parciales para la 
+* CI, char matrizFinal[4][4][NUMCARACMAX]: donde se almacenan las matrices que se guardan
+* en los CSV, int filasusadas:  es el número de motores del problema.
+* @return No devuelve nada pero actualiza la matrizFinal que se pasa por referencia. 
 */
-
-void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i){
-	
-	//numero de elementos, filas, columnas
-	
-	char matriztem1[4][4][NUMCARACMAX]; //La usaremos si hay datos en beta 
-	char matriztem2[4][4][NUMCARACMAX]; //La usaremos si hay datos en alfa
-	char matriztem3[4][4][NUMCARACMAX]; //La usaremos si hay datos en r
-	char matriztem4[4][4][NUMCARACMAX]; //La usaremos si hay datos en d
-	char matrizTem[4][4][NUMCARACMAX]; //Matriz para calcular datos temporales
-	char matrizTemb[4][4][NUMCARACMAX];
-	//char matrizFinal[4][4][NUMCARACMAX]; //Matriz Final
-	char matrizFinalb[4][4][NUMCARACMAX];
-
-	int flag=0;
+void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i){	
+	char matriztem1[4][4][NUMCARACMAX];   //La usaremos si hay datos en beta 
+	char matriztem2[4][4][NUMCARACMAX];   //La usaremos si hay datos en alfa
+	char matriztem3[4][4][NUMCARACMAX];   //La usaremos si hay datos en r
+	char matriztem4[4][4][NUMCARACMAX];   //La usaremos si hay datos en d
+	char matrizTem[4][4][NUMCARACMAX];    //Matriz para calcular datos temporales
+	char matrizTemb[4][4][NUMCARACMAX];   //Matriz para calcular datos temporales
+	char matrizFinalb[4][4][NUMCARACMAX]; //Matriz para calcular datos temporales
+	char strtemp[10]="";				  //Lista temporal
+	int flag=0;							  //Flag
+	char temporal[NUMCARACMAX];			  //Lista temporal
 	
 	inicializarMatrizIdentidad(matriztem1);
 	inicializarMatrizIdentidad(matriztem2);
@@ -100,7 +116,7 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i)
 	inicializarMatrizZeros(matrizTemb);
 	inicializarMatrizZeros(matrizFinal);
 
-	char strtemp[10]="";
+	
 	for(i;i<filasusadas;i++){ 
 		//Inicialización
 		inicializarMatrizIdentidad(matriztem1);
@@ -168,7 +184,7 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i)
 		multiply(matrizTemb,matriztem3,matrizTem);
 		multiply(matrizTem,matriztem2,matrizFinalb);
 		envolverParentesis(matrizFinalb);
-		printf("MATRIZ ----MUUUUUUUUUUUUUUUUUUUL\n");
+		printf("MATRIZ DE UN MOTOR\n");
 		int c =0;
 		int v=0;
 		for (c=0;c<4;c++){
@@ -177,7 +193,7 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i)
 			}	
 			printf("\n\n\n");
 		}
-		//En este caso si multiplicamos una matriz identidad por una matriz, pro como 
+		//En este caso si multiplicamos una matriz identidad por una matriz, pero como 
 		//se ha programado la multiplicación no devuelve la matriz no identidad por lo
 		//que creamos un flag para la primera iteración de matrizFinal
 		if (flag==0){
@@ -189,8 +205,7 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i)
 			printf("\n\nMATRIZ ----matrizTemb\n");
 			multiply(matrizTemb,matrizFinalb,matrizFinal);
 		}
-		
-		char temporal[NUMCARACMAX];
+	
 		int q =0;
 		int w=0;
 		for (q=0;q<4;q++){
@@ -213,28 +228,25 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i)
 		}	
 		printf("\n\n\n");
 	}
-
 }
 
-//Multiplica dos matrices y devuelve la matriz resultante. (mat1*mat2=mul)
+/**
+* @fn void multiply(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX],char mul[4][4][NUMCARACMAX])
+* @brief Multiplica las dos primeras matrices que recibe y guarda el resultado en la tercera (mat1*mat2=mul).
+* @param mat1 matriz 1 a multiplicar, mat2 matriz 2 a multiplicar (en ese orden), mul matriz donde se guarda el resultado. 
+* @return No devuelve nada pero actualiza mul (pasada por referencia)
+*/
 void multiply(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX],char mul[4][4][NUMCARACMAX]){
 	char temporal[NUMCARACMAX];
     for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
             strcpy(temporal,"");
             for(int k=0;k<4;k++){ 
-                //if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 ){
 				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")!=0){
-					
-					
-					//printf("Opcion 1\n");
-					//entra siempre
 
-//					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 && strcmp(mul[k][j],"1" )==0 ){		//Comprobar k o i
 					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 && strcmp(mul[i][j],"1" )==0 ){
 						continue;
 					}
-					
 					
 					strcpy(temporal,mul[i][j]);
 					strcat(temporal,"+");
@@ -245,25 +257,26 @@ void multiply(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX],char mul
 						continue;
 					}
 					
-					
 					if (strcmp(mat1[i][k],"1" )==0){
 						strcat(mul[i][j],"+");//nuevo
 						strcat(mul[i][j],mat2[k][j]);
 						continue;
-					}else if(strcmp(mat2[k][j],"1")==0){
+					}
+					
+					else if(strcmp(mat2[k][j],"1")==0){
 						strcat(mul[i][j],"+");//nuevo
 						strcat(mul[i][j],mat1[i][k]);
 						continue;
-					}else{
+					}
+					
+					else{
 						strcat(temporal,mat1[i][k]);
 						strcat(temporal,"*");
 						strcat(temporal,mat2[k][j]);
 						strcpy(mul[i][j],temporal);
 					}
 
-					continue;
-					
-					
+					continue;		
 				}
 				
 				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")==0){
@@ -271,11 +284,13 @@ void multiply(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX],char mul
 						strcpy(mul[i][j],"1");
 						continue;
 					}
+					
 					if (strcmp(mat1[i][k],"1" )==0){
 						strcpy(mul[i][j],mat2[k][j]);
-						//strcpy(mul[i][j],mat2[k][j]);
 						continue;
-					}else if(strcmp(mat2[k][j],"1")==0){
+					}
+					
+					else if(strcmp(mat2[k][j],"1")==0){
 						strcpy(mul[i][j],mat1[i][k]);
 						continue;
 					}
@@ -285,13 +300,18 @@ void multiply(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX],char mul
 					strcat(temporal,mat2[k][j]);
 					strcpy(mul[i][j],temporal);
 					continue;	
-				} 
-				 
+				} 			 
             }
         }
     }
 }
 
+/**
+* @fn void inicializarMatrizIdentidad(char mat1[4][4][NUMCARACMAX])
+* @brief inicializa con la matriz identidad la matriz que se le pasa por parámetros.
+* @param mat1 matriz a inicializar.
+* @return No devuelve nada pero actualiza la matriz pasada por referencia.
+*/
 void inicializarMatrizIdentidad(char mat1[4][4][NUMCARACMAX]){
 	for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
@@ -304,6 +324,12 @@ void inicializarMatrizIdentidad(char mat1[4][4][NUMCARACMAX]){
 	}
 }
 
+/**
+* @fn void inicializarMatrizZeros(char mat1[4][4][NUMCARACMAX])
+* @brief inicializa la matriz con zeros.
+* @param mat1 matriz a inicializar.
+* @return No devuelve nada pero actualiza la matriz pasada por referencia.
+*/
 void inicializarMatrizZeros(char mat1[4][4][NUMCARACMAX]){
 	for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
@@ -312,7 +338,12 @@ void inicializarMatrizZeros(char mat1[4][4][NUMCARACMAX]){
 	}
 }
 
-//Copia la matriz 2 en la 1
+/**
+* @fn void copiarMatriz(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX])
+* @brief copia la matriz mat2 en mat1.
+* @param mat2 matriz a copiar, mat1 matriz donde se copia mat2.
+* @return No devuelve nada pero actualiza la matriz pasada por referencia.
+*/
 void copiarMatriz(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX]){
 	for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
@@ -323,6 +354,12 @@ void copiarMatriz(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX]){
 	}
 }
 
+/**
+* @fn void envolverParentesis(char mat1[4][4][NUMCARACMAX])
+* @brief envuelve en parentesis todos los elementos de una matriz (char) a menos que sean 0 o 1
+* @param mat1 matriz a envolver en paréntesis.
+* @return No devuelve nada pero actualiza la matriz pasada por referencia.
+*/
 void envolverParentesis(char mat1[4][4][NUMCARACMAX]){
 	char temp[100];
 	for(int i=0;i<4;i++){
@@ -337,6 +374,12 @@ void envolverParentesis(char mat1[4][4][NUMCARACMAX]){
 	}
 }
 
+/**
+* @fn void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX], int i)
+* @brief guarda la matriz recibida en el csv que la corresponde.
+* @param mat1 matriz a guardar, i indica que matriz es. 
+* @return -
+*/
 void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX], int i){
 	char temporal[5];
 	char nombre[20];
@@ -363,7 +406,12 @@ void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX], int i){
 	}
 }
 
-
+/**
+* @fn matrizInversa(char mat1[4][4][NUMCARACMAX], int i)
+* @brief crea la matriz inversa de una matriz de un motor de DH. 
+* @param mat1 matriz crear, i indica que matriz es (1,2,3...).
+* @return No devuelve nada pero actualiza la matriz pasada por referencia.
+*/
 void matrizInversa(char mat1[4][4][NUMCARACMAX], int i){
 	char temporal[5];
 	sprintf(temporal,"%d",i);
@@ -439,13 +487,18 @@ void matrizInversa(char mat1[4][4][NUMCARACMAX], int i){
 	strcpy(mat1[3][3],"1");
 }
 
-
+/**
+* @fn void multiplicarYGuardarCSVMatricesInversas(int tamano)
+* @brief multiplica las matrices inversas y las guarda en los CSV correspondientes. 
+* @param tamano es el número de motores/ejes de coordenadas de nuestro problema
+* @return -
+*/
 void multiplicarYGuardarCSVMatricesInversas(int tamano){
-	char matrizI[4][4][NUMCARACMAX];
-	char matrizItem[4][4][NUMCARACMAX];
-	char matrizItem2[4][4][NUMCARACMAX];
+	char matrizI[4][4][NUMCARACMAX];		//Matriz Inversa
+	char matrizItem[4][4][NUMCARACMAX];		//Matriz para calcular datos temporales
+	char matrizItem2[4][4][NUMCARACMAX];	//Matriz para calcular datos temporales
 	char temporal[5];
-	char nombre[20];
+	char nombre[20];						//Almacena el nombre de los CSVs a crear
 	
 	if(tamano>=1){
 		matrizInversa(matrizI,1);
