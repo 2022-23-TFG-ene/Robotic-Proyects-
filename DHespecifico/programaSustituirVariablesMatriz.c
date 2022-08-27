@@ -32,18 +32,15 @@ void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4]);
 //Por lo que no es necesario crear de nuevo listaValores ya que siempre estará actualizada.
 int main(){
 	NUMMOT=filasCSVParametrosDHespecificos();
-	
 	float matriz[NUMMOT][4]; 
 	char matriztem[4][4][NUMCARACMAX]; 
 	char matrizPosFijo[4][4][NUMCARACMAX]; 
 	float *listaValores[(int)(NUMCARACMAX/4)];
-	//inicializarArray(listaValores);
 	int senosycosenos[NUMCARACMAX/100];//1 seno, 2 coseno. 3 -sen
 	int possenoycoseno=0;
 	float resultado[4][4];
 	
 	leerfilasCSVParametrosDHespecificos(matriz);
-	
 	inicializarMatrizZeros(matrizPosFijo);
 	inicializarArrayZeros(senosycosenos);
 	inicializarMatrizZeros(matriztem);
@@ -471,7 +468,7 @@ int filasCSVParametrosDHespecificos(){
 }
 
 void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4]){
-	char buffer[100];
+	char buffer[1000];
 	
 	char *record,*line;
 	int i=0,j=0;
