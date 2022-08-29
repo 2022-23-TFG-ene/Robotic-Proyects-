@@ -520,6 +520,7 @@ void multiplicarYGuardarCSVMatricesInversas(int tamano){
 		sprintf(temporal,"%d",j);
 		strcpy(nombre,"MatrizInversa-");
 		strcat(nombre,temporal);
+		strcat(nombre,".csv");
 		
 		fp = fopen(nombre, "w+");
 		for (int a =0;a<4;a++){
