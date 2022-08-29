@@ -394,7 +394,7 @@ void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX], int i){
 		sprintf(temporal,"%d",i);
 		strcpy(nombre,"MatrizNormal-");
 		strcat(nombre,temporal);
-		catcpy(nombre,".csv");
+		strcat(nombre,".csv");
 		
 		FILE *fp;
 		fp = fopen(nombre, "w+");
