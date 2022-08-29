@@ -27,7 +27,7 @@ void matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX])
 int prioridad(char x);
 void inicializarMatrizZeros2(char cola[NUMCARACMAX]);
 void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],float resultado[4][4]);
-float postfixStringAResultado(char matrizPosFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX]);
+float postfixStringAResultado(char matrizPosFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],int contadortemporalBORRAR);
 void inicializarArrayZeros(int cola[NUMCARACMAX]);
 int tipoIntroduccionDatos();
 void informacionMotoresAutomatico();
@@ -390,10 +390,11 @@ void matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX])
 * @return 
 */
 void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],float resultado[4][4]){
-	
+	int contadortemporalBORRAR =0;
 	for (int i=0;i<4;i++){
 		for (int j=0;j<4;j++){
-			resultado[i][j]=postfixStringAResultado(matrizPosFijo[i][j],listaValores,senosycosenos);
+			resultado[i][j]=postfixStringAResultado(matrizPosFijo[i][j],listaValores,senosycosenos,contadortemporalBORRAR);
+			contadortemporalBORRAR++;
 		}		
 	}
 	printf("\nMatriz Final\n");
@@ -413,9 +414,9 @@ void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX
 * sobre los valores de listaValores, resultado es la matriz resultado
 * @return devuelve el valor de cada conjunto de operaciones que hay que realizar en la celda recibida.
 */
-float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX]){
+float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],int contadortemporalBORRAR){
 	int resultadoTemporal=0;
-	float pila[strlen(arrayPostFijo)/100];//Será más pequeño siempre que el número de elementos que haya.
+	float pila[strlen(arrayPostFijo)/10];//Será más pequeño siempre que el número de elementos que haya.
 	int posicionPila=0;
 	int posicionListaValores=CONTADOR;
 	float temporal1=0,temporal2=0;
@@ -424,63 +425,77 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 		return 0;
 	}
 	
-	
 	if(arrayPostFijo[0]=='1'){
 		return 1;
 	}
-	
-	printf("\npost fijo es, %ld\n",strlen(arrayPostFijo));
-	for (int z =0;z<=strlen(arrayPostFijo);z++){  
-		printf("%c",arrayPostFijo[z]);
-	}
-	
-	printf("\nESTO ES SENOS Y COSENOS\n");
-	for (int q =0;q<=400;q++){  
-		printf("%d",senosycosenos[q]);
-	}
-	
-	for (int i =0;i< strlen(arrayPostFijo);i++){
-		
-		printf("\n\nPILA, iteracion: %d\n",i);
-		for (int j=0;j<sizeof(pila);j++ ){
-			printf("%f : ",pila[j]);
+	if (contadortemporalBORRAR==4){
+		printf("\npost fijo es, %ld\n",strlen(arrayPostFijo));
+		for (int z =0;z<=strlen(arrayPostFijo);z++){  
+			printf("%c",arrayPostFijo[z]);
 		}
-		printf("\n\n");
+	}
+	
+	if (contadortemporalBORRAR==4){
+		printf("\nESTO ES SENOS Y COSENOS\n");
+		for (int q =0;q<=400;q++){  
+			printf("%d",senosycosenos[q]);
+		}
+	}
+	for (int i =0;i< strlen(arrayPostFijo);i++){
+		if (contadortemporalBORRAR==4){
+			printf("\n\nPILA, iteracion: %d\n",i);
+			for (int j=0;j<sizeof(pila);j++ ){
+				printf("%f : ",pila[j]);
+			}
+			printf("\n\n");
+		}
 		
 		if (arrayPostFijo[i]=='2'){
+			if (contadortemporalBORRAR==4){
 			printf("Es 2, u el valor del arrayPostFijo %d y el valor es %d\n",posicionListaValores,senosycosenos[posicionListaValores]);
+			}
 			//seno 1 coseno 2 -seno 3
 			if(senosycosenos[posicionListaValores]==1){
+				if (contadortemporalBORRAR==4){
 				printf("Estamos en seno\n");
 				printf("El valor es %f, el original es %f \n",sin(*listaValores[posicionListaValores]*(PI/180)) , *listaValores[posicionListaValores]);
+				}
 				pila[posicionPila]=sin(*listaValores[posicionListaValores]*(PI/180));//Las funciones sin y cos se hacen en radianes por eso el doble cambio, lo redondeamso porque no da 0 ni los valores exactos
 				//printf("SENO-------%f",pila[posicionPila]);
 			}
 			
 			if(senosycosenos[posicionListaValores]==2){
+				if (contadortemporalBORRAR==4){
 				printf("Estamos en coseno\n");
 				printf("El valor es %f , el original es %f \n",cos(*listaValores[posicionListaValores]*(PI/180)), *listaValores[posicionListaValores]);
+				}
 				pila[posicionPila]=cos(*listaValores[posicionListaValores]*(PI/180));
+				if (contadortemporalBORRAR==4){
 				printf("posicionListaValores: %d\n",posicionListaValores);
 				printf("listaValores: %f\n",*listaValores[posicionListaValores]);
-				//printf("COSENO-------%f",pila[posicionPila]);
+				}
 			}
 			
 			if(senosycosenos[posicionListaValores]==3){
+				if (contadortemporalBORRAR==4){
 				printf("Estamos en -seno \n");
 				printf("El valor es %f , el original es %f \n",-sin(*listaValores[posicionListaValores]*(PI/180)) , *listaValores[posicionListaValores]);
+				}
 				pila[posicionPila]=-sin(*listaValores[posicionListaValores]*(PI/180));
-				//printf("-SENO-------%f",pila[posicionPila]);
 			}
 			
 			if(senosycosenos[posicionListaValores]==4){
+				if (contadortemporalBORRAR==4){
 				printf("Estamos en R o D*************************************************************************************************************************************************\n");
+				}
 				pila[posicionPila]=*listaValores[posicionListaValores];
-				//printf("R o D-------%f",pila[posicionPila]);
+				
 			}
 			
 			if(senosycosenos[posicionListaValores]==5){
+				if (contadortemporalBORRAR==4){
 				printf("Estamos en ----- R o D*************************************************************************************************************************************************\n");
+				}
 				pila[posicionPila]=-*listaValores[posicionListaValores];
 				//printf("R o D-------%f",pila[posicionPila]);
 			}
@@ -510,7 +525,7 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 	for (int j=0;j<sizeof(pila);j++ ){
 		printf("%f : ",pila[j]);
 	}
-	printf("\n\n");
+	printf("ESTAMOS EN %d\n\n",contadortemporalBORRAR);
 	printf("-------RESULTADOS: %f",pila[0]);
 	CONTADOR=posicionListaValores;
 	return pila[0];
