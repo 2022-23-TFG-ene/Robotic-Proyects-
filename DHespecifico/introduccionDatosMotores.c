@@ -39,7 +39,7 @@ int main(){
 	int angulos90=0;			//Ejes de coordenadas que no están en un motor. 
 	int decision=0;				//Indica si se quieren importar o crear los datos.
 	
-	printf("Desea importar los datos (1) o generar nuevos datos (0): ");
+	printf("Desea importar los datos desde un fichero CSV (1) o generar nuevos datos (0): ");
 	scanf(" %d",&decision);
 	
 	if (decision==0){
@@ -94,10 +94,10 @@ void guardarDatosInicialesCSV(int angulos90,FILE *datosCSV){
 */
 void introducirMotoresYAngulos(int *angulos90){
 	int angulo=0;
-	printf("el número de veces que para llegar de un motor a otro, te tienes que desplazar en más de dos sentidos respecto a los ejes de coordenadas de la base\n ");
+	printf("El número de veces que para llegar de un motor a otro, te tienes que desplazar en más de dos ejes respecto a los ejes de coordenadas de la base: ");
 	scanf("%d",&angulo);
 	*angulos90=angulo;
-	printf("Introduzca el número de motores ");
+	printf("Introduzca el número de motores: ");
 	scanf(" %d",&NUMMOT);
 }
 
@@ -208,7 +208,7 @@ void itroducirMotoresAutomatico(float matriz[NUMMOT][4],int angulos90,FILE *dato
 		}else{
 			printf("\nIndique la fila que quiere cambiar (Empieza en 1): ");
 			scanf(" %d",&fila);
-			printf("\nIntroduce el valor caracter nuevo (< izquierda 1,> derecha 2,^ arriba 3,v abajo 4,. hacia el usuario 5,x hacia el fondo 6)");
+			printf("\nIntroduce el caracter nuevo (\"<\" izquierda, \">\" derecha, \"^\" arriba, \"v\" abajo, \".\" hacia el usuario, \"x\" hacia el fondo)");
 			scanf(" %c",&valor);
 			printf("\n");
 			

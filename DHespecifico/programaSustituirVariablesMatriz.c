@@ -400,7 +400,7 @@ void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX
 	printf("\nMatriz Final\n");
 	for (int o=0;o<4;o++){
 		for(int p=0;p<4;p++){
-			printf("%f	",resultado[o][p]);
+			printf("%.4f	",resultado[o][p]);
 		}
 		printf("\n");
 	}

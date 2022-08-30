@@ -12,7 +12,7 @@
 #include<stdlib.h>
 #include<string.h>
 
-int NUMCARACMAX=10000;
+int NUMCARACMAX=50000;
 char  matriz[4][10][10];
  
 int datosIniciales();
