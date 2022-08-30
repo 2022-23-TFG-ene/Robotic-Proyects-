@@ -1,3 +1,10 @@
+/**
+ * @file programaSustituirVarialbes.c
+ * @author Jaime Sáiz de la Peña
+ * @brief Este programa parsea las matrices de DH y sustituye los parámetros de
+ * DH a partir de un CSV. Además calcula el resultado final. 
+ */
+
 #include "stdio.h"
 #include <math.h>
 #include "stdlib.h"
@@ -6,44 +13,41 @@
 #include <stdio.h>
 #include <stdlib.h> 
 
-
 int NUMMOT=2;
-int NUMCARACMAX=100000; //100: válido para 2
+int NUMCARACMAX=100000; //1000: válido para 2 - 10000: para 3 - 100000 para 5 y 6
 int CONTADOR=0;
 float PI = 3.14159265358979323846;
 
 void csvAMatriz(char matriztem[4][4][NUMCARACMAX]);
 void inicializarMatrizZeros(char mat[4][4][NUMCARACMAX]);
 void sacarListaValores(float matriz[NUMMOT][4],char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)]);
-void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],int senosycosenos[NUMCARACMAX/100],int possenoycoseno);
-int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],char temporal[NUMCARACMAX],int senosycosenos[NUMCARACMAX/100],int possenoycoseno);
+void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],int senosycosenos[NUMCARACMAX],int possenoycoseno);
+int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],char temporal[NUMCARACMAX],int senosycosenos[NUMCARACMAX],int possenoycoseno);
 void matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX]);
 int prioridad(char x);
 void inicializarMatrizZeros2(char cola[NUMCARACMAX]);
-void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX/100],float resultado[4][4]);
-float postfixStringAResultado(char matrizPosFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX/100]);
+void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],float resultado[4][4]);
+float postfixStringAResultado(char matrizPosFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],int contadortemporalBORRAR);
 void inicializarArrayZeros(int cola[NUMCARACMAX]);
 int tipoIntroduccionDatos();
 void informacionMotoresAutomatico();
 int encontrarEjeY(int x, int z);
 int filasCSVParametrosDHespecificos();
 void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4]);
+
 //Los valores que se cambien en matriz afectarán a los valores de listaValores porque apuntan a los mismos.
 //Por lo que no es necesario crear de nuevo listaValores ya que siempre estará actualizada.
 int main(){
-	NUMMOT=filasCSVParametrosDHespecificos();
-	
-	float matriz[NUMMOT][4]; 
-	char matriztem[4][4][NUMCARACMAX]; 
-	char matrizPosFijo[4][4][NUMCARACMAX]; 
-	float *listaValores[(int)(NUMCARACMAX/4)];
-	//inicializarArray(listaValores);
-	int senosycosenos[NUMCARACMAX/100];//1 seno, 2 coseno. 3 -sen
-	int possenoycoseno=0;
-	float resultado[4][4];
+	NUMMOT=filasCSVParametrosDHespecificos();	
+	float matriz[NUMMOT][4]; 					//matriz donde se almacenan los parámetros de DH
+	char matriztem[4][4][NUMCARACMAX]; 			//matriz donde se almacenan la matriz de DH sin operar (con strings en las celdas)
+	char matrizPosFijo[4][4][NUMCARACMAX]; 		//matriz donde se guardan las operaciones en postfijo
+	float *listaValores[(int)(NUMCARACMAX/4)];	//lista que almacena en orden los valores a sustituir en la matriz de DH
+	int senosycosenos[NUMCARACMAX];			//relacción de todos los tipos de valores a sustituir en la matriz de DH
+	int possenoycoseno=0;						//marca la posición en la lista de senosycosenos.
+	float resultado[4][4];						//matriz final donde se encuentran los valores finales de la matriz calculada de DH
 	
 	leerfilasCSVParametrosDHespecificos(matriz);
-	
 	inicializarMatrizZeros(matrizPosFijo);
 	inicializarArrayZeros(senosycosenos);
 	inicializarMatrizZeros(matriztem);
@@ -55,9 +59,14 @@ int main(){
 
 }
 
-
+/**
+* @fn csvAMatriz(char matriztem[4][4][NUMCARACMAX])
+* @brief pasa de CSV a matriz la matriz de DH sin haber operado (con strings en las celdas).
+* @param matriztem matriz donde se guarda la matriz del CSV.
+* @return no devuelve nada pero actualiza la matriz matriztem.
+*/
 void csvAMatriz(char matriztem[4][4][NUMCARACMAX]){
-	char buffer[1024];
+	char buffer[NUMCARACMAX];
 	
 	char *record,*line;
 	int i=0,j=0;
@@ -67,17 +76,15 @@ void csvAMatriz(char matriztem[4][4][NUMCARACMAX]){
       printf("\n No se ha podido abrir el fichero ");
       exit(0);
 	}
-	
-	while(line=fgets(buffer,sizeof(buffer),pfichero)){
+
+	for (int i =0;i<4;i++){
+		line=fgets(buffer,sizeof(buffer),pfichero);
 		record = strtok(line,"/");
 		
-		while(record != NULL){
+		for (int j =0;j<4;j++){
 			strcpy(matriztem[i][j],record) ;
 			record = strtok(NULL,"/");
-			j++;
 		}
-		j=0;
-		i++ ;
 	}
 	fclose(pfichero);
 	printf("MATRIZ\n");
@@ -89,10 +96,14 @@ void csvAMatriz(char matriztem[4][4][NUMCARACMAX]){
 		}	
 		printf("\n\n\n");
 	}
-	
 }
 
-
+/**
+* @fn void inicializarMatrizZeros(char mat[4][4][NUMCARACMAX])
+* @brief inicializa la matriz que recibe con 0.
+* @param matriz a inicializar.
+* @return no devuelve nada pero actualiza la matriz mat.
+*/
 void inicializarMatrizZeros(char mat[4][4][NUMCARACMAX]){
 	for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
@@ -101,21 +112,41 @@ void inicializarMatrizZeros(char mat[4][4][NUMCARACMAX]){
 	}
 }
 
+/**
+* @fn void inicializarMatrizZeros2(char cola[NUMCARACMAX])
+* @brief inicializa el array que recibe con 0;
+* @param array a inicializar (char).
+* @return no devuelve nada pero actualiza el array cola.
+*/
 void inicializarMatrizZeros2(char cola[NUMCARACMAX]){
 	for(int i=0;i<NUMCARACMAX;i++){
         cola[i]='0';
 	}
 }
 
+/**
+* @fn void inicializarArrayZeros(char cola[NUMCARACMAX])
+* @brief inicializa el array que recibe con 0;
+* @param array a inicializar (int).
+* @return no devuelve nada pero actualiza el array cola.
+*/
 void inicializarArrayZeros(int cola[NUMCARACMAX]){
 	for(int i=0;i<NUMCARACMAX;i++){
         cola[i]=0;
 	}
 }
 
-
+/**
+* @fn sacarListaValores(float matriz[NUMMOT][4],char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)])
+* @brief guarda en listaValores la secuencia de valores que se necesitan para las operaciones (para poder sustituir cuando
+* se vaya recorriendo el string de operaciones)
+* @param matriz "matriz" dodnde se almacenan la matriz de DH (las operaciones), matriztem matriz donde se almacenan los parámetros
+* de DH, listaValores lista en la que se almacenan en el orden a usar los valores de las variables de la matriz "matriz".
+* @return no devuelve nada pero actualiza el array cola.
+*/
 void sacarListaValores(float matriz[NUMMOT][4],char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)]){
 	int posicionListaValores=0;
+	
 	for(int i=0;i<4;i++){
 		for(int j=0;j<4;j++){
 			for(int len=0;len<strlen(matriztem[i][j]);len++){
@@ -138,6 +169,7 @@ void sacarListaValores(float matriz[NUMMOT][4],char matriztem[4][4][NUMCARACMAX]
 			}
 		}
 	}	
+	
 	//Borrar cuando esté
 	printf("valores a sustituir en matriz\n");
 	for (int z =0;z<=posicionListaValores-1;z++){  
@@ -145,10 +177,18 @@ void sacarListaValores(float matriz[NUMMOT][4],char matriztem[4][4][NUMCARACMAX]
 	}
 }
 
-void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],int senosycosenos[NUMCARACMAX/100],int possenoycoseno){	
+/**
+* @fn void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],int senosycosenos[NUMCARACMAX/100],int possenoycoseno)
+* @brief gestiona la iteración de las celdas de matriz para parsear las celdas y obtener un resultado numérico.
+* @param matriztem matriz en la que se almacena la matriz de DH sin operar, listaValores es donde se guardan los valores en orden a sustituir
+* en  la matriztem, matrizPosFijo es la matriztem pasada a postfijo, senosycosenos es la relacción de operaciones que hay que realizar a los 
+* valores de listaValores (coseno, seno, ...)
+* @return -
+*/
+void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],int senosycosenos[NUMCARACMAX],int possenoycoseno){	
     char temporal[NUMCARACMAX];
     char cadenaTemp[NUMCARACMAX]; 
-    //int senosycosenos[NUMCARACMAX];//1 seno, 2 coseno. 3 -sen
+    
     for(int i=0;i<4;i++){
 		for(int j=0;j<4;j++){
 			strcpy(cadenaTemp,"");
@@ -168,10 +208,17 @@ void parsearMatrizTem(char matriztem[4][4][NUMCARACMAX],float *listaValores[(int
 		}	
 		printf("\n\n\n");
 	}
-	
 }
 
-int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],char temporal[NUMCARACMAX],int senosycosenos[NUMCARACMAX/100],int possenoycoseno){
+/**
+* @fn int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],char temporal[NUMCARACMAX],int senosycosenos[NUMCARACMAX/100],int possenoycoseno)
+* @brief parsea la matriz de DH y realiza las operaciones que se recogen en esta. 
+* @param expresion es la celda de matriztem a parsear, listaValores almacena los valores en orden a sustituir
+* en  la matriztem, matrizPosFijo es la matriztem pasada a postfijo, senosycosenos es la relacción de operaciones que hay que realizar a los 
+* valores de listaValores (coseno, seno, ...)
+* @return devuelve la posicion que se ha usado hasta el momento a la hora de parsear la matriz. 
+*/
+int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],char matrizPosFijo[4][4][NUMCARACMAX],char temporal[NUMCARACMAX],int senosycosenos[NUMCARACMAX],int possenoycoseno){
 	char pila[NUMCARACMAX];
 	char cola[NUMCARACMAX]; 
 	inicializarMatrizZeros2(cola);
@@ -301,7 +348,12 @@ int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARAC
 	return possenoycoseno;
 }
 
-
+/**
+* @fn int prioridad(char x)
+* @brief devuelve la prioridad de distintos operadores.
+* @param x es un operador.
+* @return devuelve la prioridad de x.
+*/
 int prioridad(char x){
     if(x=='('){
         return 0;
@@ -315,6 +367,12 @@ int prioridad(char x){
     return 0;
 }
 
+/**
+* @fn matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX])
+* @brief 
+* @param 
+* @return 
+*/
 void matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX]){
 	char str1[2];
 	str1[1] = '\0';
@@ -324,16 +382,21 @@ void matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX])
 	}
 }
 
-void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX/100],float resultado[4][4]){
-	
+/**
+* @fn matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX])
+* @brief Calcula el resultado de la matriz paerseada.
+* @param matrizPosFijo matriz parseada, listaValores valores a sustituir en orden en la matriz parseada, senosycosenos son las operaciones a realizar
+* sobre los valores de listaValores, resultado es la matriz resultado
+* @return 
+*/
+void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],float resultado[4][4]){
+	int contadortemporalBORRAR =0;
 	for (int i=0;i<4;i++){
 		for (int j=0;j<4;j++){
-			resultado[i][j]=postfixStringAResultado(matrizPosFijo[i][j],listaValores,senosycosenos);
+			resultado[i][j]=postfixStringAResultado(matrizPosFijo[i][j],listaValores,senosycosenos,contadortemporalBORRAR);
+			contadortemporalBORRAR++;
 		}		
 	}
-	
-	
-	//resultado[0][0]=postfixStringAResultado(matrizPosFijo[0][0],listaValores,senosycosenos);
 	printf("\nMatriz Final\n");
 	for (int o=0;o<4;o++){
 		for(int p=0;p<4;p++){
@@ -344,9 +407,16 @@ void sustitucionYCalculoDatosMatrizParseada(char matrizPosFijo[4][4][NUMCARACMAX
 	
 }
 
-float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX/100]){
+/**
+* @fn float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX/100])
+* @brief parsea el array que le llega y aplica las operaciones a cada elemento que se indican en senosucosenos
+* @param matrizPosFijo matriz parseada, listaValores valores a sustituir en orden en la matriz parseada, senosycosenos son las operaciones a realizar
+* sobre los valores de listaValores, resultado es la matriz resultado
+* @return devuelve el valor de cada conjunto de operaciones que hay que realizar en la celda recibida.
+*/
+float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValores[(int)(NUMCARACMAX/4)],int senosycosenos[NUMCARACMAX],int contadortemporalBORRAR){
 	int resultadoTemporal=0;
-	float pila[strlen(arrayPostFijo)];//Será más pequeño siempre que el número de elementos que haya.
+	float pila[strlen(arrayPostFijo)/10];//Será más pequeño siempre que el número de elementos que haya.
 	int posicionPila=0;
 	int posicionListaValores=CONTADOR;
 	float temporal1=0,temporal2=0;
@@ -355,64 +425,77 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 		return 0;
 	}
 	
-	
 	if(arrayPostFijo[0]=='1'){
 		return 1;
 	}
-	
-	printf("\npost fijo es, %ld\n",strlen(arrayPostFijo));
-	for (int z =0;z<=strlen(arrayPostFijo);z++){  
-		printf("%c",arrayPostFijo[z]);
-	}
-	
-	printf("\nESTO ES SENOS Y COSENOS\n");
-	for (int q =0;q<=400;q++){  
-		printf("%d",senosycosenos[q]);
-	}
-	
-	for (int i =0;i< strlen(arrayPostFijo);i++){
-		
-		printf("\n\n--------------------------------pila_----, iteracion: %d\n",i);
-		for (int j=0;j<strlen(arrayPostFijo);j++ ){
-			printf("%f : ",pila[j]);
+	if (contadortemporalBORRAR==4){
+		printf("\npost fijo es, %ld\n",strlen(arrayPostFijo));
+		for (int z =0;z<=strlen(arrayPostFijo);z++){  
+			printf("%c",arrayPostFijo[z]);
 		}
-		printf("\n\n");
+	}
+	
+	if (contadortemporalBORRAR==4){
+		printf("\nESTO ES SENOS Y COSENOS\n");
+		for (int q =0;q<=400;q++){  
+			printf("%d",senosycosenos[q]);
+		}
+	}
+	for (int i =0;i< strlen(arrayPostFijo);i++){
+		if (contadortemporalBORRAR==4){
+			printf("\n\nPILA, iteracion: %d\n",i);
+			for (int j=0;j<sizeof(pila);j++ ){
+				printf("%f : ",pila[j]);
+			}
+			printf("\n\n");
+		}
 		
 		if (arrayPostFijo[i]=='2'){
+			if (contadortemporalBORRAR==4){
 			printf("Es 2, u el valor del arrayPostFijo %d y el valor es %d\n",posicionListaValores,senosycosenos[posicionListaValores]);
+			}
 			//seno 1 coseno 2 -seno 3
-			//Pasamos los ángulos de grados a radiantes para aplicar las funciones matemáticas.
 			if(senosycosenos[posicionListaValores]==1){
+				if (contadortemporalBORRAR==4){
 				printf("Estamos en seno\n");
 				printf("El valor es %f, el original es %f \n",sin(*listaValores[posicionListaValores]*(PI/180)) , *listaValores[posicionListaValores]);
+				}
 				pila[posicionPila]=sin(*listaValores[posicionListaValores]*(PI/180));//Las funciones sin y cos se hacen en radianes por eso el doble cambio, lo redondeamso porque no da 0 ni los valores exactos
 				//printf("SENO-------%f",pila[posicionPila]);
 			}
+			
 			if(senosycosenos[posicionListaValores]==2){
+				if (contadortemporalBORRAR==4){
 				printf("Estamos en coseno\n");
 				printf("El valor es %f , el original es %f \n",cos(*listaValores[posicionListaValores]*(PI/180)), *listaValores[posicionListaValores]);
+				}
 				pila[posicionPila]=cos(*listaValores[posicionListaValores]*(PI/180));
+				if (contadortemporalBORRAR==4){
 				printf("posicionListaValores: %d\n",posicionListaValores);
 				printf("listaValores: %f\n",*listaValores[posicionListaValores]);
-				//printf("COSENO-------%f",pila[posicionPila]);
-
-			}
-			if(senosycosenos[posicionListaValores]==3){
-				printf("Estamos en -seno \n");
-				printf("El valor es %f , el original es %f \n",-sin(*listaValores[posicionListaValores]*(PI/180)) , *listaValores[posicionListaValores]);
-				pila[posicionPila]=-sin(*listaValores[posicionListaValores]*(PI/180));
-				//printf("-SENO-------%f",pila[posicionPila]);
+				}
 			}
 			
-			//////////////////////////////////////////////////////////////////////////////////////////NUEVO caso r y caso d
+			if(senosycosenos[posicionListaValores]==3){
+				if (contadortemporalBORRAR==4){
+				printf("Estamos en -seno \n");
+				printf("El valor es %f , el original es %f \n",-sin(*listaValores[posicionListaValores]*(PI/180)) , *listaValores[posicionListaValores]);
+				}
+				pila[posicionPila]=-sin(*listaValores[posicionListaValores]*(PI/180));
+			}
+			
 			if(senosycosenos[posicionListaValores]==4){
+				if (contadortemporalBORRAR==4){
 				printf("Estamos en R o D*************************************************************************************************************************************************\n");
+				}
 				pila[posicionPila]=*listaValores[posicionListaValores];
-				//printf("R o D-------%f",pila[posicionPila]);
+				
 			}
 			
 			if(senosycosenos[posicionListaValores]==5){
+				if (contadortemporalBORRAR==4){
 				printf("Estamos en ----- R o D*************************************************************************************************************************************************\n");
+				}
 				pila[posicionPila]=-*listaValores[posicionListaValores];
 				//printf("R o D-------%f",pila[posicionPila]);
 			}
@@ -439,16 +522,21 @@ float postfixStringAResultado(char arrayPostFijo[NUMCARACMAX],float *listaValore
 	
 	
 	printf("\n\n--------------------------------pila*\n");
-	for (int j=0;j<strlen(arrayPostFijo);j++ ){
+	for (int j=0;j<sizeof(pila);j++ ){
 		printf("%f : ",pila[j]);
 	}
-	printf("\n\n");
+	printf("ESTAMOS EN %d\n\n",contadortemporalBORRAR);
 	printf("-------RESULTADOS: %f",pila[0]);
 	CONTADOR=posicionListaValores;
 	return pila[0];
 }
 
-
+/**
+* @fn int filasCSVParametrosDHespecificos()
+* @brief cuenta el número de filas que tiene la matriz de parámetros de DH.
+* @param -
+* @return devuelve el número de filas que tiene la matriz de parámetros de DH.
+*/
 int filasCSVParametrosDHespecificos(){
     FILE *fichero;
     int lineas = 0;
@@ -470,8 +558,14 @@ int filasCSVParametrosDHespecificos(){
     return lineas;
 }
 
+/**
+* @fn void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4])
+* @brief lee y copia las celdas de la matriz de parámetros de DH (CSV).
+* @param recibe la matriz donde se guardan dichos datos. 
+* @return no devuelve nada pero guarda los datos en matriz pasada por referencia. 
+*/
 void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4]){
-	char buffer[100];
+	char buffer[1000];
 	
 	char *record,*line;
 	int i=0,j=0;
