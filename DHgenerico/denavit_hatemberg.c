@@ -5,6 +5,7 @@
 
 
 float matriz[10][4]; 
+float PI = 3.14159265358979323846;
 
 void AnadirMotor(int fila);
 void AnadirBrazo(int fila);
@@ -82,15 +83,15 @@ void calculaMatrizDH(int filasusadas){
 		inicializarMatrizIdentidad(matrizTem);
 		
 		//Beta
-		matriztem1[0][0]=cos(matriz[i][0]);
-		matriztem1[0][1]=-sin(matriz[i][0]);
-		matriztem1[1][0]=sin(matriz[i][0]);
-		matriztem1[1][1]=cos(matriz[i][0]);
+		matriztem1[0][0]=cos(matriz[i][0]*(PI/180));
+		matriztem1[0][1]=-sin(matriz[i][0]*(PI/180));
+		matriztem1[1][0]=sin(matriz[i][0]*(PI/180));
+		matriztem1[1][1]=cos(matriz[i][0]*(PI/180));
 		//Alfa
-		matriztem2[1][1]=cos(matriz[i][1]);
-		matriztem2[1][2]=-sin(matriz[i][1]);
-		matriztem2[2][1]=sin(matriz[i][1]);
-		matriztem2[2][2]=cos(matriz[i][1]);
+		matriztem2[1][1]=cos(matriz[i][1]*(PI/180));
+		matriztem2[1][2]=-sin(matriz[i][1]*(PI/180));
+		matriztem2[2][1]=sin(matriz[i][1]*(PI/180));
+		matriztem2[2][2]=cos(matriz[i][1]*(PI/180));
 		//r
 		matriztem3[0][3]=matriz[i][2];
 		//d
@@ -109,7 +110,7 @@ void calculaMatrizDH(int filasusadas){
 	int r=0;
 	for (q=0;q<4;q++){
 		for(r=0;r<4;r++){
-			printf("%f " ,matrizFinal[q][r]);
+			printf("%f " ,roundf(matrizFinal[q][r]));
 		}
 	printf("\n");
 	}
