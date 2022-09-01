@@ -1,30 +1,11 @@
 
-teta1=0 ,d1=10 ,a1=0
-alfa1=10
-teta2=0
-d2=0
-a2=0
-alfa2=10
-teta3=40
-d3=0
-a3=0
-alfa3=10
-teta4=0
-d4=0
-a4=0
-alfa4=10
-teta5=0
-d5=10
-a5=0
-alfa5=10
-teta6=40
-d6=0
-a6=0
-alfa6=10
-teta7=0
-d7=0
-a7=0
-alfa7=10
+teta1=0 ,d1=10 ,a1=0 , alfa1=10
+teta2=0 , d2=0 , a2=0 , alfa2=10
+teta3=40 , d3=0 , a3=0 , alfa3=10
+teta4=0 , d4=0 , a4=0 , alfa4=10
+teta5=0 , d5=10 , a5=0 , alfa5=10
+teta6=40 , d6=0 , a6=0 , alfa6=10
+teta7=0 , d7=0 , a7=0 , alfa7=10
 
 A=[cosd(teta1) -cosd(alfa1)*sind(teta1) sind(alfa1)*sind(teta1) a1*cosd(teta1);
    sind(teta1) cosd(alfa1)*cosd(teta1) -sind(alfa1)*cosd(teta1) a1*sind(teta1);
