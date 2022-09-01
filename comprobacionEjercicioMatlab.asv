@@ -1,0 +1,106 @@
+%syms theta1 d1 theta2 d2 d3 theta4 theta5 theta6 d6
+
+% theta1=0
+% d1=10
+% d2=12
+% d3=14
+% theta4=0
+% theta5=0
+% theta6=0
+% PI=sym('pi')
+% TO1=DH(theta1+90,d1,-PI/2)
+% T12=DH(theta2+90,d2,0,PI/2)
+% T23=DH(0,d3,0,-PI/2)
+% T34=DH(theta4,0,0,-PI/2)
+% T45=DH(theta5,0,0,PI/2)
+% T56=DH(theta6,d6,0,0)
+% T06=simplify(TO1,T12,T23,T34,T45,T56)
+% 
+% 
+% function M=DH(theta,d,a,alpha)
+% 
+% M=rotz(theta)*transl(a,0,d)*rotx(alpha);
+teta1=0
+d1=0
+a1=0
+alfa1=10
+teta2=0
+d2=0
+a2=0
+alfa2=10
+teta3=0
+d3=0
+a3=0
+alfa3=10
+teta4=0
+d4=0
+a4=0
+alfa4=10
+teta5=0
+d5=0
+a5=0
+alfa5=10
+teta6=0
+d6=0
+a6=0
+alfa6=10
+teta7=0
+d7=0
+a7=0
+alfa7=10
+
+A=[cosd(teta1) -cosd(alfa1)*sind(teta1) sin(alfa1)*sin(teta1) a1*cos(teta1);
+   sin(teta1) cos(alfa1)*cos(teta1) -sin(alfa1)*cos(teta1) a1*sin(teta1);
+   0 sin(alfa1) cos(alfa1) d1;
+   0 0 0 1]
+
+B=[cos(teta2) -cos(alfa2)*sin(teta2) sin(alfa2)*sin(teta2) a2*cos(teta2);
+   sin(teta2) cos(alfa2)*cos(teta2) -sin(alfa2)*cos(teta2) a2*sin(teta2);
+   0 sin(alfa2) cos(alfa2) d2;
+   0 0 0 1]
+
+C=[cos(teta3) -cos(alfa3)*sin(teta3) sin(alfa3)*sin(teta3) a3*cos(teta3);
+   sin(teta3) cos(alfa3)*cos(teta3) -sin(alfa3)*cos(teta3) a3*sin(teta3);
+   0 sin(alfa3) cos(alfa3) d3;
+   0 0 0 1]
+
+D=[cos(teta4) -cos(alfa4)*sin(teta4) sin(alfa4)*sin(teta4) a4*cos(teta4);
+   sin(teta4) cos(alfa4)*cos(teta4) -sin(alfa4)*cos(teta4) a4*sin(teta4);
+   0 sin(alfa4) cos(alfa4) d4;
+   0 0 0 1]
+
+E=[cos(teta5) -cos(alfa5)*sin(teta5) sin(alfa5)*sin(teta5) a5*cos(teta5);
+   sin(teta5) cos(alfa5)*cos(teta5) -sin(alfa5)*cos(teta5) a5*sin(teta5);
+   0 sin(alfa5) cos(alfa5) d5;
+   0 0 0 1]
+
+F=[cos(teta6) -cos(alfa6)*sin(teta6) sin(alfa6)*sin(teta6) a6*cos(teta6);
+   sin(teta6) cos(alfa6)*cos(teta6) -sin(alfa6)*cos(teta6) a6*sin(teta6);
+   0 sin(alfa6) cos(alfa6) d6;
+   0 0 0 1]
+
+F=[cos(teta7) -cos(alfa7)*sin(teta7) sin(alfa7)*sin(teta7) a7*cos(teta7);
+   sin(teta7) cos(alfa7)*cos(teta7) -sin(alfa7)*cos(teta7) a7*sin(teta7);
+   0 sin(alfa7) cos(alfa7) d7;
+   0 0 0 1]
+
+
+G=A*B*C*D*F
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
