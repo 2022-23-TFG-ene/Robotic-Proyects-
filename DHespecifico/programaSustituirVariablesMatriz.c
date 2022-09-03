@@ -34,10 +34,17 @@ void informacionMotoresAutomatico();
 int encontrarEjeY(int x, int z);
 int filasCSVParametrosDHespecificos();
 void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4]);
+int menuInicial();
+void sustituirValores(char matriztem[4][4][NUMCARACMAX]);
+void sustitucionValores(char matriztem[4][4][NUMCARACMAX],char asustituir [3],int nuevoValor);
+void csvAMatrizDeFila(char CSVASustituir[20],char csvAMatrizResultado[16][NUMCARACMAX]);
+void matrizDeFilaSustituirValor(char CSVASustituir[20],char csvAMatriz[16][NUMCARACMAX]);
+void guardarSustitucionenCSV(char listaSustituida[16][NUMCARACMAX],char CSVASustituir[20]);
 
 //Los valores que se cambien en matriz afectarán a los valores de listaValores porque apuntan a los mismos.
 //Por lo que no es necesario crear de nuevo listaValores ya que siempre estará actualizada.
 int main(){
+	int decisionMenuInicial=0;
 	NUMMOT=filasCSVParametrosDHespecificos();	
 	float matriz[NUMMOT][4]; 					//matriz donde se almacenan los parámetros de DH
 	char matriztem[4][4][NUMCARACMAX]; 			//matriz donde se almacenan la matriz de DH sin operar (con strings en las celdas)
@@ -46,15 +53,37 @@ int main(){
 	int senosycosenos[NUMCARACMAX];			//relacción de todos los tipos de valores a sustituir en la matriz de DH
 	int possenoycoseno=0;						//marca la posición en la lista de senosycosenos.
 	float resultado[4][4];						//matriz final donde se encuentran los valores finales de la matriz calculada de DH
+	char basura='0';
+	//Nuevo
+	char CSVASustituir[20];
+	char csvAMatrizResultado[16][NUMCARACMAX];
 	
-	leerfilasCSVParametrosDHespecificos(matriz);
-	inicializarMatrizZeros(matrizPosFijo);
-	inicializarArrayZeros(senosycosenos);
-	inicializarMatrizZeros(matriztem);
-	csvAMatriz(matriztem);
-	sacarListaValores(matriz,matriztem,listaValores);
-	parsearMatrizTem(matriztem,listaValores,matrizPosFijo,senosycosenos,possenoycoseno);
-	sustitucionYCalculoDatosMatrizParseada(matrizPosFijo,listaValores,senosycosenos,resultado);
+	decisionMenuInicial=menuInicial();
+	if(decisionMenuInicial==1){
+		leerfilasCSVParametrosDHespecificos(matriz);
+		inicializarMatrizZeros(matrizPosFijo);
+		inicializarArrayZeros(senosycosenos);
+		inicializarMatrizZeros(matriztem);
+		csvAMatriz(matriztem);
+		sacarListaValores(matriz,matriztem,listaValores);
+		parsearMatrizTem(matriztem,listaValores,matrizPosFijo,senosycosenos,possenoycoseno);
+		sustitucionYCalculoDatosMatrizParseada(matrizPosFijo,listaValores,senosycosenos,resultado);
+	}else{
+		printf("Introduzca el CSV de la matriz con la que quiere trabajar (nombre.csv)");
+		scanf(" %s",CSVASustituir);
+		scanf("%c",&basura); 
+		printf("Esto es CSVA %s***************************************************************************************************************************************************************************************\n\n\n\n\n\n",CSVASustituir);
+		if(strcmp(CSVASustituir,"MatrizDHGenerica.csv")==0){
+			printf("\n\nEntra aquí");
+			inicializarMatrizZeros(matriztem);
+			csvAMatriz(matriztem);
+			sustituirValores(matriztem);
+		}
+		else{
+			csvAMatrizDeFila(CSVASustituir,csvAMatrizResultado);
+			matrizDeFilaSustituirValor(CSVASustituir,csvAMatrizResultado);
+		}
+	}
 	return 0;
 
 }
@@ -270,7 +299,7 @@ int parsearString(char expresion[NUMCARACMAX],float *listaValores[(int)(NUMCARAC
 					possenoycoseno++;
 				}
 			}
-			/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////NUEVO
+			
 			if(expresion[i]== 'r'||expresion[i]== 'd'){
 				senosycosenos[possenoycoseno]=4;//4
 				i=i+1;
@@ -369,7 +398,7 @@ int prioridad(char x){
 
 /**
 * @fn matrizCharAString(char temporal[NUMCARACMAX], char cadenaTemp[NUMCARACMAX])
-* @brief 
+* @brief convierte una cadena de carácteres en un string.
 * @param 
 * @return 
 */
@@ -596,6 +625,290 @@ void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4]){
 		}	
 		printf("\n\n\n");
 	}
-	
 }
+
+
+int menuInicial(){
+	int decision=0;
+	printf("Introduzca un 1 si desea calcular el resultado numérico de la matriz de DH a partir de los parámetros de este, para sustituir valores en el string introduzca un 0");
+	scanf(" %d",&decision);
+	return decision;
+}
+
+void sustituirValores(char matriztem[4][4][NUMCARACMAX]){
+	char sustituir='s';
+	char asustituir [3];
+	int nuevoValor=0;
+	while(sustituir=='s'){
+		printf("¿Que valor desea sustituir? Introducir solamente 1 ej: b3 ");
+		scanf(" %s",asustituir);
+		printf("¿Por que valor numérico lo desea sustituir?");
+		scanf(" %d",&nuevoValor);
+		printf("¿Desea seguir sustituyendo valores? (s/n): ");
+		scanf(" %c",&sustituir);
+	}
+
+	sustitucionValores(matriztem,asustituir,nuevoValor);
+}
+
+
+void sustitucionValores(char matriztem[4][4][NUMCARACMAX],char asustituir [3],int nuevoValor){
+	char matrizSemiSustituida[4][4][NUMCARACMAX];
+	char c=' ';
+	int k=0;
+	char temporalc[2];
+	char temporal[NUMCARACMAX];
+	char valorSustituir[10];
+	for (int i=0;i<4;i++){
+		for (int j=0;j<4;j++){
+			k=0;
+			c=matriztem[i][j][k];
+			strcpy(temporal,"\0");
+			if (strlen(matriztem[i][j])==1){
+				strcpy(matrizSemiSustituida[i][j],matriztem[i][j]);
+			}
+			printf("El es el valor de c : %c\n",c);
+			while(c!='\0'){
+				printf("El elemento es : %c\n",c);
+				if (c==asustituir[0] && matriztem[i][j][k+1]==asustituir[1]){
+					if(matriztem[i][j][k-1]=='(' && matriztem[i][j][k+2]==')'){
+						if(matriztem[i][j][k-2]=='s'){
+							if(matriztem[i][j][k-3]!='-'){ //Para que no se junten 2 -- seguidos
+								temporal[strlen(temporal)-2]='\0'; 
+								sprintf(valorSustituir,"%f",sin(nuevoValor)*(PI/180));
+								strcat(temporal,valorSustituir);
+								k=k+3;
+							}
+							else{
+								if(sin(nuevoValor)>0){
+									temporal[strlen(temporal)-2]='\0';
+									sprintf(valorSustituir,"%f",sin(nuevoValor*(PI/180)));
+									strcat(temporal,valorSustituir);
+									k=k+3;
+								}
+								else{
+									temporal[strlen(temporal)-3]='\0';
+									sprintf(valorSustituir,"%f",sin(nuevoValor*(PI/180))*-1);
+									strcat(temporal,valorSustituir);
+									k=k+3;
+								}
+							}
+						}
+						if(matriztem[i][j][k-2]=='c'){
+							if(matriztem[i][j][k-3]!='-'){ //Para que no se junten 2 -- seguidos
+								temporal[strlen(temporal)-2]='\0';
+								sprintf(valorSustituir,"%f",cos(nuevoValor*(PI/180)));
+								strcat(temporal,valorSustituir);
+								k=k+3;
+							}
+							else{
+								if(sin(nuevoValor)>0){
+									temporal[strlen(temporal)-2]='\0';
+									sprintf(valorSustituir,"%f",cos(nuevoValor*(PI/180)));
+									strcat(temporal,valorSustituir);
+									k=k+3;
+								}
+								else{
+									temporal[strlen(temporal)-3]='\0';
+									sprintf(valorSustituir,"%f",cos(nuevoValor*(PI/180))*-1);
+									strcat(temporal,valorSustituir);
+									k=k+3;
+								}
+							}	
+						}
+						
+						if(c=='r' || c=='d'){
+							temporal[strlen(temporal)-1]='\0';
+							sprintf(valorSustituir,"%d",nuevoValor);
+							strcat(temporal,valorSustituir);
+							k=k+3;
+						}
+						
+					}
+					
+					if(c==asustituir[0] && (c=='r' || c=='d') && matriztem[i][j][k+1]==asustituir[1]){
+						sprintf(valorSustituir,"%d",nuevoValor);
+						strcat(temporal,valorSustituir);
+						k=k+2;
+					}
+				}
+				else{
+					temporalc[0]=c;
+					strcat(temporal,temporalc);
+					k=k+1;
+				}
+				c=matriztem[i][j][k];
+			}
+			
+			strcpy(matrizSemiSustituida[i][j],temporal);
+		}
+	}
+	
+	for (int a=0;a<4;a++){
+		for(int b=0;b<4;b++){
+			printf("%s           " ,matrizSemiSustituida[a][b]);
+		}	
+		printf("\n\n\n");
+	}
+}
+
+void csvAMatrizDeFila(char CSVASustituir[20],char csvAMatriz[16][NUMCARACMAX]){
+	char buffer[NUMCARACMAX];
+	int i=0;
+	int longitud=0;
+	int flag=0;
+	FILE *pfichero = fopen(CSVASustituir,"r");
+	if(pfichero == NULL){
+		printf("\n No se ha podido abrir el fichero ");
+		exit(0);
+	}
+
+	while(i<=31){
+		fgets(buffer,NUMCARACMAX,pfichero);
+		//fscanf(pfichero,"%[^\n]",buffer);
+		longitud=strlen(buffer);
+		printf("Longitud es: %d",longitud);
+		
+		if(flag==1){
+			flag=0;
+			continue;
+		}
+		flag=1;
+		strcpy(csvAMatriz[i],buffer);
+		i=i+1;
+	}
+	fclose(pfichero);
+	for (int a=0;a<16;a++){
+		printf("%s\n",csvAMatriz[a]);
+	}
+}
+//			MatrizNormal-2.csv
+//asustituir se lo tengo que pasar
+void matrizDeFilaSustituirValor(char CSVASustituir[20],char csvAMatriz[16][NUMCARACMAX]){
+	int k=0;
+	char c=' ';
+	char temporalc[2];
+	char temporal[2];
+	char listaSustituida[16][NUMCARACMAX];
+	char valorSustituir[10];
+	char sustituir='s';
+	char asustituir [2];
+	int nuevoValor=0;
+	
+	printf("¿Que valor desea sustituir? Introducir solamente 1 ej: b3 ");
+	scanf(" %s",asustituir);
+	printf("¿Por que valor numérico lo desea sustituir?");
+	scanf("%d",&nuevoValor);
+
+	for (int i=0;i<16;i++){
+		k=0;
+		c=csvAMatriz[i][k];
+		strcpy(listaSustituida[i],"\0");
+		if (strlen(csvAMatriz[i])<2){
+			strcpy(listaSustituida[i],csvAMatriz[i]);
+			continue;
+		}
+		//printf("bucle0\n");
+		while( csvAMatriz[i][k]!='\0'){
+			//printf("bucle1\n");
+			if (c==asustituir[0] && csvAMatriz[i][k+1]==asustituir[1]){
+				if(csvAMatriz[i][k-1]=='(' && csvAMatriz[i][k+2]==')'){
+					if(csvAMatriz[i][k-2]=='s'){
+						if(csvAMatriz[i][k-3]!='-'){ //Para que no se junten 2 -- seguidos
+							listaSustituida[i][strlen(listaSustituida[i])-2]='\0'; 
+							sprintf(valorSustituir,"%f",sin(nuevoValor*(PI/180)));
+							strcat(listaSustituida[i],valorSustituir);
+							k=k+3;
+						}
+						else{
+							if(sin(nuevoValor)*(PI/180)>=0){
+								listaSustituida[i][strlen(listaSustituida[i])-2]='\0';
+								sprintf(valorSustituir,"%f",sin(nuevoValor*(PI/180)));
+								strcat(listaSustituida[i],valorSustituir);
+								k=k+3;
+							}
+							else{
+								listaSustituida[i][strlen(listaSustituida[i])-3]='\0';
+								sprintf(valorSustituir,"%f",sin(nuevoValor*(PI/180))*-1);
+								strcat(listaSustituida[i],valorSustituir);
+								k=k+3;
+							}
+						}
+					}
+					if(csvAMatriz[i][k-2]=='c'){
+						if(csvAMatriz[i][k-3]!='-'){ //Para que no se junten 2 -- seguidos
+							listaSustituida[i][strlen(listaSustituida[i])-2]='\0'; 
+							sprintf(valorSustituir,"%f",cos(nuevoValor*(PI/180)));
+							strcat(listaSustituida[i],valorSustituir);
+							k=k+3;
+						}
+						else{
+							if(sin(nuevoValor)>=0){
+								listaSustituida[i][strlen(listaSustituida[i])-2]='\0';
+								sprintf(valorSustituir,"%f",cos(nuevoValor*(PI/180)));
+								strcat(listaSustituida[i],valorSustituir);
+								k=k+3;
+							}
+							else{
+								listaSustituida[i][strlen(listaSustituida[i])-3]='\0';
+								sprintf(valorSustituir,"%f",cos(nuevoValor*(PI/180))*-1);
+								strcat(listaSustituida[i],valorSustituir);
+								k=k+3;
+							}
+						}
+					}
+				
+					if(c=='r' || c=='d'){
+						listaSustituida[i][strlen(listaSustituida[i])-1]='\0';
+						sprintf(valorSustituir,"%d",nuevoValor);
+						strcat(listaSustituida[i],valorSustituir);
+						k=k+2;
+					}
+				
+				}
+				else{
+					sprintf(valorSustituir,"%d",nuevoValor);
+					strcat(listaSustituida[i],valorSustituir);
+					k=k+2;
+				}
+			}
+			
+			else{
+				temporalc[0]=c;
+				strcat(listaSustituida[i],temporalc);
+				k=k+1;
+			}
+			c=csvAMatriz[i][k];
+		}
+	}
+/*
+	for (int a=0;a<16;a++){
+		printf("%s           \n\n" ,listaSustituida[a]);
+	}*/
+	
+	guardarSustitucionenCSV(listaSustituida,CSVASustituir);
+}
+
+void guardarSustitucionenCSV(char listaSustituida[16][NUMCARACMAX],char CSVASustituir[20]){
+	FILE *fp;
+	char nuevoNombre[25];
+	CSVASustituir[strlen(CSVASustituir)-4]='\0';
+	strcpy(nuevoNombre,CSVASustituir);
+	strcat(nuevoNombre,"Sustituido.csv");
+	fp = fopen(nuevoNombre, "w+");
+	if(fp==NULL){
+		printf("\n No se ha podido abrir el fichero ");
+		exit(0);
+	}
+	
+	for(int i=0 ;i<16;i++){
+		fprintf(fp,"%s\n",listaSustituida[i]);
+	}
+	
+	fclose(fp);
+}
+
+
+
+
 
