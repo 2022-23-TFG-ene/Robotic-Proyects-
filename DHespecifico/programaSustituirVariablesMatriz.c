@@ -627,7 +627,13 @@ void leerfilasCSVParametrosDHespecificos(float matriz[NUMMOT][4]){
 	}
 }
 
-
+/**
+* @fn int menuInicial()
+* @brief permite al usuario o calcular el resultado numérico de la matriz DH o sustituir
+* algunos valores. 
+* @param -
+* @return decision devuelve una de las dos opciones posibles. 
+*/
 int menuInicial(){
 	int decision=0;
 	printf("Introduzca un 1 si desea calcular el resultado numérico de la matriz de DH a partir de los parámetros de este, para sustituir valores en el string introduzca un 0");
@@ -635,6 +641,12 @@ int menuInicial(){
 	return decision;
 }
 
+/**
+* @fn void sustituirValores(char matriztem[4][4][NUMCARACMAX])
+* @brief realiza preguntas necesarias para sustituir los valores de la matriz de DH.
+* @param matriztem de DH obtenida de un CSV. 
+* @return -
+*/
 void sustituirValores(char matriztem[4][4][NUMCARACMAX]){
 	char sustituir='s';
 	char asustituir [3];
@@ -651,7 +663,13 @@ void sustituirValores(char matriztem[4][4][NUMCARACMAX]){
 	sustitucionValores(matriztem,asustituir,nuevoValor);
 }
 
-
+/**
+* @fn void sustitucionValores(char matriztem[4][4][NUMCARACMAX],char asustituir [3],int nuevoValor)
+* @brief sustituye los valores de la matriz de DH guardada como matriz[][] no como filas. 
+* @param matriztem matriz de DH genérica, asustituir elemento a buscar y sustituir, nuevoValor
+* el nuevo valor por el que se deberá sustituir el elemento buscado. 
+* @return -
+*/
 void sustitucionValores(char matriztem[4][4][NUMCARACMAX],char asustituir [3],int nuevoValor){
 	char matrizSemiSustituida[4][4][NUMCARACMAX];
 	char c=' ';
@@ -752,6 +770,15 @@ void sustitucionValores(char matriztem[4][4][NUMCARACMAX],char asustituir [3],in
 	}
 }
 
+/**
+* @fn csvAMatrizDeFila(char CSVASustituir[20],char csvAMatriz[16][NUMCARACMAX])
+* @brief convierte un archivo CSV donde los valores se guardan en filas y no 
+* con formato coluna en una matriz de 1 columna.
+* @param CSVASustituir nombre del archivo al que se quiere sustituir una variable
+* por un valorm, csvAMatriz es el CSV donde se quiere sustituir una variable convertido
+* en matriz. 
+* @return -
+*/
 void csvAMatrizDeFila(char CSVASustituir[20],char csvAMatriz[16][NUMCARACMAX]){
 	char buffer[NUMCARACMAX];
 	int i=0;
@@ -782,8 +809,15 @@ void csvAMatrizDeFila(char CSVASustituir[20],char csvAMatriz[16][NUMCARACMAX]){
 		printf("%s\n",csvAMatriz[a]);
 	}
 }
-//			MatrizNormal-2.csv
-//asustituir se lo tengo que pasar
+
+/**
+* @fn void matrizDeFilaSustituirValor(char CSVASustituir[20],char csvAMatriz[16][NUMCARACMAX])
+* @brief sustituye una variable por un valor a lo largo de toda una matriz de 16x1.
+* @param CSVASustituir nombre del archivo al que se quiere sustituir una variable
+* por un valorm, csvAMatriz es el CSV donde se quiere sustituir una variable convertido
+* en matriz. 
+* @return -
+*/
 void matrizDeFilaSustituirValor(char CSVASustituir[20],char csvAMatriz[16][NUMCARACMAX]){
 	int k=0;
 	char c=' ';
@@ -829,8 +863,6 @@ void matrizDeFilaSustituirValor(char CSVASustituir[20],char csvAMatriz[16][NUMCA
 							}
 							else{
 								listaSustituida[i][strlen(listaSustituida[i])-3]='\0';
-								sprintf(valorSustituir,"%f",sin(nuevoValor*(PI/180))*-1);
-								strcat(listaSustituida[i],valorSustituir);
 								k=k+3;
 							}
 						}
@@ -881,14 +913,16 @@ void matrizDeFilaSustituirValor(char CSVASustituir[20],char csvAMatriz[16][NUMCA
 			c=csvAMatriz[i][k];
 		}
 	}
-/*
-	for (int a=0;a<16;a++){
-		printf("%s           \n\n" ,listaSustituida[a]);
-	}*/
-	
 	guardarSustitucionenCSV(listaSustituida,CSVASustituir);
 }
 
+/**
+* @fn guardarSustitucionenCSV(char listaSustituida[16][NUMCARACMAX],char CSVASustituir[20])
+* @brief guarda las matrices modificadas 16x1 por el programa en archivos CSV.
+* @param  listaSustituida matriz donde se guardan los valores modificados,CSVASustituir es 
+* el nombre de la matriz origen y necesaria para la obtención del nuevo nombre. 
+* @return -
+*/
 void guardarSustitucionenCSV(char listaSustituida[16][NUMCARACMAX],char CSVASustituir[20]){
 	FILE *fp;
 	char nuevoNombre[25];

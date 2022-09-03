@@ -34,15 +34,15 @@ int main(){
 	char matrizFinal[4][4][NUMCARACMAX];  //Matriz final o parcial de DH a guardar en un CSV
 	int tamano=0;						  //Numero de motores/ejes de coordenadas de nuestro problema
 	int i=0;							  //Variable temporal
-	printf("************************************************************\n");
-	printf("* Este programa crea la matriz de DH de los motores que    *\n");
-	printf("* indique el usuario.                                      *\n");
-	printf("*                                                          *\n");
-	printf("* Dicha matriz es creada en un archivo CSV.                *\n");
-	printf("*                                                          *\n");
-	printf("* Autor: Jaime Sáiz de la Peña                             *\n");
-	printf("*                                                          *\n");
-	printf("************************************************************\n");
+	printf("**********************************************************************\n");
+	printf("* Este programa crea la matriz de DH en funcion de los motores que   *\n");
+	printf("* indique el usuario y la guarda en el CSV \"MatrizDHGenerica.csv\".  *\n");
+	printf("* Además se crean todas las matrices necesarias para resolver.       *\n");
+	printf("*                                                                    *\n");
+	printf("*                                                                    *\n");
+	printf("* Autor: Jaime Sáiz de la Peña                                       *\n");
+	printf("*                                                                    *\n");
+	printf("**********************************************************************\n");
 	
 	tamano=datosIniciales();
 	for(int i=0; i<tamano; i++){
