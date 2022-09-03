@@ -13,7 +13,7 @@
 #include<string.h>
 
 int NUMCARACMAX=50000;
-char  matriz[4][10][10];
+char matriz[4][10][10];
  
 int datosIniciales();
 void AnadirMotor(int fila);
@@ -26,7 +26,9 @@ void envolverParentesis(char mat1[4][4][NUMCARACMAX]);
 void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX], int i);
 void matrizInversa(char mat1[4][4][NUMCARACMAX], int i);
 void multiplicarYGuardarCSVMatricesInversas(int tamano);
-
+void matrizNormalACSV(char mat1[4][4][NUMCARACMAX],int numeroMatriz);
+void contarBetas(int tamano);
+void contarBetasCSVconcreto(FILE *BETASCSV,char nombre[20],int tamano);
 
 int main(){
 	char matrizFinal[4][4][NUMCARACMAX];  //Matriz final o parcial de DH a guardar en un CSV
@@ -48,6 +50,7 @@ int main(){
 		guardarMatrizenFichero(matrizFinal,i);
 	}
 	multiplicarYGuardarCSVMatricesInversas(tamano);
+	contarBetas(tamano);
 }
 
 
@@ -107,6 +110,7 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i)
 	char strtemp[10]="";				  //Lista temporal
 	int flag=0;							  //Flag
 	char temporal[NUMCARACMAX];			  //Lista temporal
+	int numeroMatriz=1;
 	
 	inicializarMatrizIdentidad(matriztem1);
 	inicializarMatrizIdentidad(matriztem2);
@@ -182,6 +186,8 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i)
 		//Orden de multiplicación B d a alfa
 		multiply(matriztem1,matriztem4,matrizTemb);
 		multiply(matrizTemb,matriztem3,matrizTem);
+		matrizNormalACSV(matrizTem,numeroMatriz);
+		numeroMatriz=numeroMatriz+1;
 		multiply(matrizTem,matriztem2,matrizFinalb);
 		envolverParentesis(matrizFinalb);
 		printf("MATRIZ DE UN MOTOR\n");
@@ -384,12 +390,16 @@ void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX], int i){
 	char nombre[20];
 	if(i==0){
 		FILE *fp;
+		FILE *fp2;
 		fp = fopen("MatrizDHGenerica.csv", "w+");
+		fp2 = fopen("MatrizDHGenericaFilas.csv", "w+");
 		for (int i =0;i<4;i++){
 			//separación " / "
 			fprintf(fp,"%s / %s / %s / %s\n", mat1[i][0], mat1[i][1], mat1[i][2], mat1[i][3]);
+			fprintf(fp2,"%s\n\n%s\n\n%s\n\n%s\n\n", mat1[i][0], mat1[i][1], mat1[i][2], mat1[i][3]);
 		} 
 		fclose(fp);
+		fclose(fp2);
 	}else{
 		sprintf(temporal,"%d",i);
 		strcpy(nombre,"MatrizNormal-");
@@ -400,7 +410,7 @@ void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX], int i){
 		fp = fopen(nombre, "w+");
 		for (int i =0;i<4;i++){
 			//separación " / "
-			fprintf(fp,"%s / %s / %s / %s\n", mat1[i][0], mat1[i][1], mat1[i][2], mat1[i][3]);
+			fprintf(fp,"%s\n\n%s\n\n%s\n\n%s\n\n", mat1[i][0], mat1[i][1], mat1[i][2], mat1[i][3]);
 		} 
 		fclose(fp);
 	}
@@ -490,7 +500,7 @@ void matrizInversa(char mat1[4][4][NUMCARACMAX], int i){
 /**
 * @fn void multiplicarYGuardarCSVMatricesInversas(int tamano)
 * @brief multiplica las matrices inversas y las guarda en los CSV correspondientes. 
-* @param tamano es el número de motores/ejes de coordenadas de nuestro problema
+* @param tamano es el número de motores/ejes de coordenadas de nuestro problema.
 * @return -
 */
 void multiplicarYGuardarCSVMatricesInversas(int tamano){
@@ -504,32 +514,187 @@ void multiplicarYGuardarCSVMatricesInversas(int tamano){
 		matrizInversa(matrizI,1);
 		FILE *fp;
 		fp = fopen("MatrizInversa-1.csv", "w+");
+		if(fp==NULL){
+			printf("\n No se ha podido abrir el fichero ");
+			exit(0);
+		}
+		FILE *fp2;
+		fp2 = fopen("MatrizI-1.csv", "w+");
+		if(fp2==NULL){
+			printf("\n No se ha podido abrir el fichero ");
+			exit(0);
+		}
 		for (int i =0;i<4;i++){
 			//separación " / "
-			fprintf(fp,"%s / %s / %s / %s\n", matrizI[i][0], matrizI[i][1], matrizI[i][2], matrizI[i][3]);
+			fprintf(fp,"%s\n\n%s\n\n%s\n\n%s\n\n", matrizI[i][0], matrizI[i][1], matrizI[i][2], matrizI[i][3]);
+			fprintf(fp2,"%s\n\n%s\n\n%s\n\n%s\n\n", matrizI[i][0], matrizI[i][1], matrizI[i][2], matrizI[i][3]);
 		}	 
 		fclose(fp);
 	}
 	
 	for (int j=2;j<=tamano;j++){
 		matrizInversa(matrizItem,j);
+		FILE *fp2;
+		sprintf(temporal,"%d",j);
+		strcpy(nombre,"MatrizI-");
+		strcat(nombre,temporal);
+		strcat(nombre,".csv");
+		fp2 = fopen(nombre, "w+");
+		if(fp2==NULL){
+			printf("\n No se ha podido abrir el fichero ");
+			exit(0);
+		}
+		for (int a =0;a<4;a++){
+			//separación " / "
+			fprintf(fp2,"%s\n\n%s\n\n%s\n\n%s\n\n", matrizItem[a][0], matrizItem[a][1], matrizItem[a][2], matrizItem[a][3]);
+			}	 
+		fclose(fp2);
 		inicializarMatrizZeros(matrizItem2);
 		multiply(matrizI,matrizItem,matrizItem2);
 		copiarMatriz(matrizI,matrizItem2);
 		FILE *fp;
-		
 		sprintf(temporal,"%d",j);
 		strcpy(nombre,"MatrizInversa-");
 		strcat(nombre,temporal);
 		strcat(nombre,".csv");
 		
 		fp = fopen(nombre, "w+");
+		if(fp==NULL){
+			printf("\n No se ha podido abrir el fichero ");
+			exit(0);
+		}
 		for (int a =0;a<4;a++){
 			//separación " / "
-			fprintf(fp,"%s / %s / %s / %s\n", matrizI[a][0], matrizI[a][1], matrizI[a][2], matrizI[a][3]);
+			fprintf(fp,"%s\n\n%s\n\n%s\n\n%s\n\n", matrizI[a][0], matrizI[a][1], matrizI[a][2], matrizI[a][3]);
 			}	 
 		fclose(fp);
 	}
+}
+
+/**
+* @fn matrizNormalACSV(char mat1[4][4][NUMCARACMAX],int numeroMatriz)
+* @brief guarda las matrices normales a CSV.
+* @param mat1 matriz a guardar en un CSV, numeroMatriz indicador del nombre con el que se tiene que guardar.
+* @return -
+*/
+void matrizNormalACSV(char mat1[4][4][NUMCARACMAX],int numeroMatriz){
+	char tecontarBetas();
+	char temporal[5];
+	char nombre[20];						//Almacena el nombre de los CSVs a crear
+	FILE *fp;
+	sprintf(temporal,"%d",numeroMatriz);
+	strcpy(nombre,"MatrizN-");
+	strcat(nombre,temporal);
+	strcat(nombre,".csv");
+	fp = fopen(nombre, "w+");
+	if(fp==NULL){
+		printf("\n No se ha podido abrir el fichero ");
+      exit(0);
+	}
+	for (int a =0;a<4;a++){
+		//separación " / "
+		fprintf(fp,"%s\n\n%s\n\n%s\n\n%s\n\n", mat1[a][0], mat1[a][1], mat1[a][2], mat1[a][3]);
+		}	 
+	fclose(fp);
+}	
+
+/**
+* @fn contarBetas(int tamano)
+* @brief gestiona el conteo de las Betas de los CSV creados.
+* @param tamano es el número de motores del problema.
+* @return -
+*/
+void contarBetas(int tamano){
+	FILE *BETASCSV;
+	BETASCSV=fopen("BETASCSV.csv", "w+");
+	fclose(BETASCSV);
+	char temporal[2];	
+	char nombre[20];
+	contarBetasCSVconcreto(BETASCSV,"MatrizDHGenericaFilas.csv",tamano);
+	for (int i=0;i<tamano;i++){
+		strcpy(nombre,"MatrizInversa-");
+		sprintf(temporal,"%d",i+1);
+		strcat(nombre,temporal);
+		strcat(nombre,".csv");
+		contarBetasCSVconcreto(BETASCSV,nombre,tamano);
+		if(i+1<tamano){
+			strcpy(nombre,"MatrizNormal-");
+			sprintf(temporal,"%d",i+1);
+			strcat(nombre,temporal);
+			strcat(nombre,".csv");
+			contarBetasCSVconcreto(BETASCSV,nombre,tamano);
+		}
+	}
+
+
+}
+
+/**
+* @fn contarBetasCSVconcreto(FILE *BETASCSV,char nombre[20],int tamano){
+* @brief cuenta las Betas de los CSV creados.
+* @param BETASCSV es el CSV donde se guardan betas de las matrices, 
+* nombre es el nombre del CSV a evaluar y tamano es el número de motores del problema.
+* @return -
+*/
+void contarBetasCSVconcreto(FILE *BETASCSV,char nombre[20],int tamano){
+	int sumatorio[tamano];
+	int temp=0;
+	int flag=1;
+	char c =' ';
+	char cero='0';
+	char variableNumero[100];
+	char temporal1[10];
+	char temporal2[10];
+	strcpy(variableNumero," ");
+	for(int j=0;j<tamano;j++){
+		sumatorio[j]=0;
+	}
+	FILE *fp;
+	fp = fopen(nombre, "r");
+	BETASCSV = fopen("BETASCSV.csv", "a+");
+
+	if(fp==NULL){
+		printf("\n No se ha podido abrir el fichero ");
+      exit(0);
+	}
+	if(BETASCSV==NULL){
+		printf("\n No se ha podido abrir el fichero ");
+      exit(0);
+	}
+	fprintf(BETASCSV,"MATRIZ: %s\n",nombre);
+	while(!feof(fp)){
+		c=fgetc(fp);
+		if(c=='b'){
+			c=fgetc(fp);
+			temp=c-'0';
+			sumatorio[temp-1]=sumatorio[temp-1]+1;
+		}
+				
+		if(c=='\n' && flag==1){
+			for (int i=0;i<tamano;i++){
+				strcat(variableNumero,"b");
+				sprintf(temporal1,"%d",i+1);
+				strcat(variableNumero,temporal1);
+				strcat(variableNumero,"=");
+				sprintf(temporal2,"%d",sumatorio[i]);
+				strcat(variableNumero,temporal2);
+				strcat(variableNumero," - ");
+				sumatorio[i]=0;
+
+			}
+			for(int j=0;j<tamano;j++){
+				sumatorio[j]=0;
+			}
+			flag=0;
+			fprintf(BETASCSV,"%s\n",variableNumero);
+			strcpy(variableNumero," ");
+		}else if(c=='\n' && flag==0){
+			flag=1;
+		}
+	}
+	fprintf(BETASCSV,"\n\n**********************************\n\n");	
+	fclose(fp);
+	fclose(BETASCSV);
 }
 
 
