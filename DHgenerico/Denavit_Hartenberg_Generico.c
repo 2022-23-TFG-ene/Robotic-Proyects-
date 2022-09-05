@@ -40,17 +40,12 @@ int main(){
 return 0;
 }
 
-//Esta función lo que hará será añadir Motores a la secuencia de motores y Segmentos
 void AnadirMotor(int fila){
-	//beta->giro sobre z, alfa-> giro sobre x, r-> distancia entre ejes x de motores, d-> distancia en z
-	//z apunta hacia donde se desplaza y si es giro sobre el pivote que se gira
 	printf("Introducir Motor beta alfa r d (separado por espacios)\n");
 	scanf("%f" "%f" "%f" "%f",&matriz[fila][0],&matriz[fila][1],&matriz[fila][2],&matriz[fila][3] );
-	//Los motores serán representados con un 0
 	matriz[fila][4]=0;
-	//pasamos de grados a radianes
-	matriz[fila][0]=matriz[fila][0];//*(3.14/180) para pasar a radianes
-	matriz[fila][1]=matriz[fila][1];//*(3.14/180) para pasar a radianes
+	matriz[fila][0]=matriz[fila][0];
+	matriz[fila][1]=matriz[fila][1];
 
 }
 
@@ -98,7 +93,7 @@ void calculaMatrizDH(int filasusadas){
 		matriztem4[2][3]=matriz[i][3];
 
 		//Realizamos las multiplicaciones necesarias
-		//El orden de multiplicaciones debe ser beta, d, r, alfa
+		//El orden de multiplicaciones es beta, d, r, alfa
 		multiply(matriztem1,matriztem4,matrizTem);
 		multiply(matrizTem,matriztem3,matrizTemb);
 		multiply(matrizTemb,matriztem2,matrizTem);
