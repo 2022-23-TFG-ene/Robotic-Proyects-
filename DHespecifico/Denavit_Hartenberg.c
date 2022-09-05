@@ -12,7 +12,8 @@
 #include<stdlib.h>
 #include<string.h>
 
-int NUMCARACMAX=50000;
+int NUMCARACMAX=10000;
+int tamano=5;
 char matriz[4][10][10];
  
 int datosIniciales();
@@ -25,15 +26,27 @@ void inicializarMatrizZeros(char mat1[4][4][NUMCARACMAX]);
 void envolverParentesis(char mat1[4][4][NUMCARACMAX]);
 void guardarMatrizenFichero(char mat1[4][4][NUMCARACMAX], int i);
 void matrizInversa(char mat1[4][4][NUMCARACMAX], int i);
-void multiplicarYGuardarCSVMatricesInversas(int tamano);
+void multiplicarYGuardarCSVMatricesInversas(int tamano,char matrizFinal[4][4][NUMCARACMAX]);
 void matrizNormalACSV(char mat1[4][4][NUMCARACMAX],int numeroMatriz);
 void contarBetas(int tamano);
 void contarBetasCSVconcreto(FILE *BETASCSV,char nombre[20],int tamano);
+void csvAMatriz(char CSVASustituir[50],char matriz2[10][4][4][100],int numero);
+void introducirMatricesPropias(char matrizDHTotal[4][4][NUMCARACMAX],int tamano);
+void multiplicar(char mat1[4][4][100],char mat2[4][4][100],char mul[4][4][NUMCARACMAX]);
+void multiplicarMatricesInversas(char matriz2[10][4][4][100],int tamano);
+void multiplicar2(char mat1[4][4][100],char mat2[4][4][NUMCARACMAX],char mul[4][4][NUMCARACMAX]);
+void matrizNormalACSV2(char mat1[4][4][NUMCARACMAX],int numeroMatriz);
+void copiarMatriz2(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX]);
+void matrizInversaACSV2(char mat1[4][4][NUMCARACMAX],int numeroMatriz,int tamano);
+void matrizNormalACSV3(char mat1[4][4][100],int numeroMatriz);
+void multiplicar3( char mat1[4][4][NUMCARACMAX],char mat2[4][4][100],char mul[4][4][NUMCARACMAX]);
 
 int main(){
 	char matrizFinal[4][4][NUMCARACMAX];  //Matriz final o parcial de DH a guardar en un CSV
-	int tamano=0;						  //Numero de motores/ejes de coordenadas de nuestro problema
+	char matrizDHTotal[4][4][NUMCARACMAX]; 
+	//int tamano=0;						  //Numero de motores/ejes de coordenadas de nuestro problema
 	int i=0;							  //Variable temporal
+	int decision;
 	printf("**********************************************************************\n");
 	printf("* Este programa crea la matriz de DH en funcion de los motores que   *\n");
 	printf("* indique el usuario y la guarda en el CSV \"MatrizDHGenerica.csv\".  *\n");
@@ -45,12 +58,26 @@ int main(){
 	printf("**********************************************************************\n");
 	
 	tamano=datosIniciales();
-	for(int i=0; i<tamano; i++){
-		calculaMatrizDH(tamano,matrizFinal,i);
-		guardarMatrizenFichero(matrizFinal,i);
+	printf("Desea introducir matrices propias simplificadas a través de CSV (1) o desea realizar la multiplicación de DH y calcular las matrices (0)");
+	scanf(" %d", &decision);
+	if(decision==0){
+		for(int i=0; i<tamano; i++){
+			calculaMatrizDH(tamano,matrizFinal,i);
+			if(i==0){
+				for (int a=0;a<4;a++){
+					for (int b=0;b<4;b++){
+						strcpy(matrizDHTotal[a][b],matrizFinal[a][b]);
+					}
+				}
+			}
+			guardarMatrizenFichero(matrizFinal,i);
+		}
+		multiplicarYGuardarCSVMatricesInversas(tamano,matrizDHTotal);
+		contarBetas(tamano);
 	}
-	multiplicarYGuardarCSVMatricesInversas(tamano);
-	contarBetas(tamano);
+	else{
+		introducirMatricesPropias(matrizDHTotal,tamano);
+	}
 }
 
 
@@ -366,7 +393,7 @@ void copiarMatriz(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX]){
 * @return No devuelve nada pero actualiza la matriz pasada por referencia.
 */
 void envolverParentesis(char mat1[4][4][NUMCARACMAX]){
-	char temp[100];
+	char temp[NUMCARACMAX];
 	for(int i=0;i<4;i++){
         for(int j=0;j<4;j++){
 			if (strcmp(mat1[i][j],"0")!=0 && strcmp(mat1[i][j],"1")!=0){
@@ -503,12 +530,12 @@ void matrizInversa(char mat1[4][4][NUMCARACMAX], int i){
 * @param tamano es el número de motores/ejes de coordenadas de nuestro problema.
 * @return -
 */
-void multiplicarYGuardarCSVMatricesInversas(int tamano){
+void multiplicarYGuardarCSVMatricesInversas(int tamano,char matrizFinal[4][4][NUMCARACMAX]){
 	char matrizI[4][4][NUMCARACMAX];		//Matriz Inversa
 	char matrizItem[4][4][NUMCARACMAX];		//Matriz para calcular datos temporales
 	char matrizItem2[4][4][NUMCARACMAX];	//Matriz para calcular datos temporales
-	char temporal[5];
-	char nombre[20];						//Almacena el nombre de los CSVs a crear
+	char temporal[50];
+	char nombre[100];						//Almacena el nombre de los CSVs a crear
 	
 	if(tamano>=1){
 		matrizInversa(matrizI,1);
@@ -532,6 +559,20 @@ void multiplicarYGuardarCSVMatricesInversas(int tamano){
 		fclose(fp);
 	}
 	
+	int c =0;
+	int v=0;
+	printf("nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
+	for (c=0;c<4;c++){
+		for(v=0;v<4;v++){
+			printf("%s           " ,matrizFinal[c][v]);
+		}	
+		printf("\n\n\n");
+	}
+	printf("\n\nAqui casca0\n\n");
+	
+	multiply(matrizI,matrizFinal,matrizItem2);
+	copiarMatriz(matrizI,matrizItem2);
+	
 	for (int j=2;j<=tamano;j++){
 		matrizInversa(matrizItem,j);
 		FILE *fp2;
@@ -547,10 +588,12 @@ void multiplicarYGuardarCSVMatricesInversas(int tamano){
 		for (int a =0;a<4;a++){
 			//separación " / "
 			fprintf(fp2,"%s\n\n%s\n\n%s\n\n%s\n\n", matrizItem[a][0], matrizItem[a][1], matrizItem[a][2], matrizItem[a][3]);
-			}	 
+			}
+			printf("\n\nAqui casca2\n\n");	 
 		fclose(fp2);
 		inicializarMatrizZeros(matrizItem2);
-		multiply(matrizI,matrizItem,matrizItem2);
+		//multiply(matrizI,matrizItem,matrizItem2);	//Cambiar esto
+		multiply(matrizItem,matrizI,matrizItem2);
 		copiarMatriz(matrizI,matrizItem2);
 		FILE *fp;
 		sprintf(temporal,"%d",j);
@@ -560,13 +603,14 @@ void multiplicarYGuardarCSVMatricesInversas(int tamano){
 		
 		fp = fopen(nombre, "w+");
 		if(fp==NULL){
-			printf("\n No se ha podido abrir el fichero ");
+			printf("\n No se ha podido abrir el fichero 1");
 			exit(0);
 		}
 		for (int a =0;a<4;a++){
 			//separación " / "
 			fprintf(fp,"%s\n\n%s\n\n%s\n\n%s\n\n", matrizI[a][0], matrizI[a][1], matrizI[a][2], matrizI[a][3]);
-			}	 
+		}
+		printf("\n\nAqui casca\n\n");	 
 		fclose(fp);
 	}
 }
@@ -625,8 +669,6 @@ void contarBetas(int tamano){
 			contarBetasCSVconcreto(BETASCSV,nombre,tamano);
 		}
 	}
-
-
 }
 
 /**
@@ -697,9 +739,438 @@ void contarBetasCSVconcreto(FILE *BETASCSV,char nombre[20],int tamano){
 	fclose(BETASCSV);
 }
 
+void introducirMatricesPropias(char matrizDHTotal[4][4][NUMCARACMAX],int tamano){
+	char CSVASustituir[50];
+	int tamano2=tamano*2;
+	char matriz2[10][4][4][100];
+	char temporal2[10];
+	printf("Tamano2 es igual a %d\n",tamano2);
+	//for (int i=0;i< tamano*2;i++){
+	for (int i=0;i<tamano*2;i++){
+		if (i<tamano){
+			strcpy(CSVASustituir,"MatrizN-");
+			sprintf(temporal2,"%d",i+1);
+			strcat(CSVASustituir,temporal2);
+			strcat(CSVASustituir,".csv");
+			csvAMatriz(CSVASustituir,matriz2,i);
+		}
+		else{
+			strcpy(CSVASustituir,"MatrizI-");
+			sprintf(temporal2,"%d",i-tamano+1);
+			strcat(CSVASustituir,temporal2);
+			strcat(CSVASustituir,".csv");
+			csvAMatriz(CSVASustituir,matriz2,i);
+		}
+	}
+	multiplicarMatricesInversas(matriz2,tamano);
+}
+
+
+void csvAMatriz(char CSVASustituir[50],char matriz2[10][4][4][100],int numero){
+	char buffer[NUMCARACMAX];
+	int i=0;
+	int longitud=0;
+	int flag=0;
+	int n=0;
+	int m=0;
+
+	FILE *pfichero = fopen(CSVASustituir,"r");
+	if(pfichero == NULL){
+		printf("\nNo se ha podido abrir el fichero\n");
+		exit(0);
+	}
+	
+	for (int i =0;i<31;i++){
+		fgets(buffer,100,pfichero);
+		buffer[strlen(buffer)-1]='\0';
+		if (buffer[0]=='\n' || buffer[0]=='\0' ){
+			continue;
+		}
+		if (buffer[0]==' ' ){
+			printf("Espacioooooo");
+		}
+		strcpy(matriz2[numero][m][n],buffer);
+		if(n>=3){
+			m=m+1;
+			n=0;
+		}else{
+			n=n+1;
+		}
+	}
+	printf("matriz guardada, %s\n",CSVASustituir);
+	
+	int a =0;
+	int b=0;
+	for (a=0;a<4;a++){
+		for(b=0;b<4;b++){
+			printf("%s " ,matriz2[numero][a][b]);
+		}	
+		printf("\n\n");
+	}
+}
+
+
+void multiplicarMatricesInversas(char matriz2[10][4][4][100],int tamano){
+	char matrizNormalTotal1[4][4][NUMCARACMAX];
+	char matriztemporal1[4][4][NUMCARACMAX];
+	char matriztemporal2[4][4][NUMCARACMAX];
+	int i=0;
+
+	inicializarMatrizZeros(matrizNormalTotal1);
+	printf("TAMANO ES: %d\n",tamano);
+	for (int i=0;i<tamano-1 ;i++){
+		//Se hace en este orden para imprimir matrices del proceso, aunqeu 
+		//sería más eficiente hacerlo directamente en el sentido contrario.
+		if (i==0){
+			inicializarMatrizZeros(matriztemporal1);
+			multiplicar(matriz2[i],matriz2[i+1], matriztemporal1);
+			envolverParentesis(matriztemporal1);
+		}else{
+			inicializarMatrizZeros(matriztemporal2);
+			multiplicar3(matriztemporal1,matriz2[i+1], matriztemporal2);
+			envolverParentesis(matriztemporal2);
+			copiarMatriz2(matriztemporal1,matriztemporal2);
+		}
+		for (int a=0;a<4;a++){
+				for(int b=0;b<4;b++){
+					printf("%s       " ,matriztemporal1[a][b]);
+				}	
+				printf("\n\n");
+			}
+			printf("\n\n****************************\n\n\n\n\n");
+		
+	}
+	printf("\n\nHEMOS PASADO\n\n\n\n\n");
+	copiarMatriz2(matrizNormalTotal1,matriztemporal1);
+	matrizNormalACSV2(matrizNormalTotal1,0);	
+	
+	//Para sacar las normales parciales
+	//int contador2=2;
+	for (int i=tamano-1;i>1 ;i--){
+		printf("Entra aquiiiii\n");
+		if (i==tamano-1){
+			matrizNormalACSV3(matriz2[i],tamano-1);
+			inicializarMatrizZeros(matriztemporal1);
+			multiplicar(matriz2[i-1],matriz2[i], matriztemporal1);
+			envolverParentesis(matriztemporal1);
+			matrizNormalACSV2(matriztemporal1,i-1);
+
+		}else{
+			inicializarMatrizZeros(matriztemporal2);
+			multiplicar2(matriz2[i-1],matriztemporal1, matriztemporal2);
+			envolverParentesis(matriztemporal2);
+			copiarMatriz2(matriztemporal1,matriztemporal2);
+			matrizNormalACSV2(matriztemporal2,i-1);
+		}
+	}
+	
+	//Sacamos las inversas
+	///Jaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaime
+	///tengo que importar la nueva y multiplicarla a esto 
+	
+	int contador=1;
+	for (int i=0;i<tamano ;i++){
+			inicializarMatrizZeros(matriztemporal2);
+			multiplicar2(matriz2[i+tamano],matrizNormalTotal1, matriztemporal2);
+			envolverParentesis(matriztemporal2);
+			copiarMatriz2(matrizNormalTotal1,matriztemporal2);
+	
+		matrizInversaACSV2(matriztemporal2,contador,i+1);
+		contador++;
+	}
+	
+	
+}
+
+
+void multiplicar(char mat1[4][4][100],char mat2[4][4][100],char mul[4][4][NUMCARACMAX]){
+	char temporal[NUMCARACMAX];
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            strcpy(temporal,"");
+            for(int k=0;k<4;k++){ 
+				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")!=0){
+
+					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 && strcmp(mul[i][j],"1" )==0 ){
+						continue;
+					}
+					
+					strcpy(temporal,mul[i][j]);
+					strcat(temporal,"+");
+					
+					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 ){
+						strcat(temporal,"1");
+						strcpy(mul[i][j],temporal);
+						continue;
+					}
+					
+					if (strcmp(mat1[i][k],"1" )==0){
+						strcat(mul[i][j],"+");//nuevo
+						strcat(mul[i][j],mat2[k][j]);
+						continue;
+					}
+					
+					else if(strcmp(mat2[k][j],"1")==0){
+						strcat(mul[i][j],"+");//nuevo
+						strcat(mul[i][j],mat1[i][k]);
+						continue;
+					}
+					
+					else{
+						strcat(temporal,mat1[i][k]);
+						strcat(temporal,"*");
+						strcat(temporal,mat2[k][j]);
+						strcpy(mul[i][j],temporal);
+					}
+
+					continue;		
+				}
+				
+				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")==0){
+					if (strcmp(mat1[i][k],"1" )==0 && strcmp(mat2[k][j],"1" )==0){
+						strcpy(mul[i][j],"1");
+						continue;
+					}
+					
+					if (strcmp(mat1[i][k],"1" )==0){
+						strcpy(mul[i][j],mat2[k][j]);
+						continue;
+					}
+					
+					else if(strcmp(mat2[k][j],"1")==0){
+						strcpy(mul[i][j],mat1[i][k]);
+						continue;
+					}
+					
+					strcpy(temporal,mat1[i][k]);
+					strcat(temporal,"*");
+					strcat(temporal,mat2[k][j]);
+					strcpy(mul[i][j],temporal);
+					continue;	
+				} 			 
+            }
+        }
+    }
+}
+
+void multiplicar2(char mat1[4][4][100],char mat2[4][4][NUMCARACMAX],char mul[4][4][NUMCARACMAX]){
+	char temporal[NUMCARACMAX];
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            strcpy(temporal,"");
+            for(int k=0;k<4;k++){ 
+				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")!=0){
+
+					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 && strcmp(mul[i][j],"1" )==0 ){
+						continue;
+					}
+					
+					strcpy(temporal,mul[i][j]);
+					strcat(temporal,"+");
+					
+					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 ){
+						strcat(temporal,"1");
+						strcpy(mul[i][j],temporal);
+						continue;
+					}
+					
+					if (strcmp(mat1[i][k],"1" )==0){
+						strcat(mul[i][j],"+");//nuevo
+						strcat(mul[i][j],mat2[k][j]);
+						continue;
+					}
+					
+					else if(strcmp(mat2[k][j],"1")==0){
+						strcat(mul[i][j],"+");//nuevo
+						strcat(mul[i][j],mat1[i][k]);
+						continue;
+					}
+					
+					else{
+						strcat(temporal,mat1[i][k]);
+						strcat(temporal,"*");
+						strcat(temporal,mat2[k][j]);
+						strcpy(mul[i][j],temporal);
+					}
+
+					continue;		
+				}
+				
+				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")==0){
+					if (strcmp(mat1[i][k],"1" )==0 && strcmp(mat2[k][j],"1" )==0){
+						strcpy(mul[i][j],"1");
+						continue;
+					}
+					
+					if (strcmp(mat1[i][k],"1" )==0){
+						strcpy(mul[i][j],mat2[k][j]);
+						continue;
+					}
+					
+					else if(strcmp(mat2[k][j],"1")==0){
+						strcpy(mul[i][j],mat1[i][k]);
+						continue;
+					}
+					
+					strcpy(temporal,mat1[i][k]);
+					strcat(temporal,"*");
+					strcat(temporal,mat2[k][j]);
+					strcpy(mul[i][j],temporal);
+					continue;	
+				} 			 
+            }
+        }
+    }
+}
 
 
 
+void multiplicar3( char mat1[4][4][NUMCARACMAX],char mat2[4][4][100],char mul[4][4][NUMCARACMAX]){
+	char temporal[NUMCARACMAX];
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            strcpy(temporal,"");
+            for(int k=0;k<4;k++){ 
+				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")!=0){
+
+					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 && strcmp(mul[i][j],"1" )==0 ){
+						continue;
+					}
+					
+					strcpy(temporal,mul[i][j]);
+					strcat(temporal,"+");
+					
+					if (strcmp(mat1[i][k],"1" )==0  && strcmp(mat2[k][j],"1" )==0 ){
+						strcat(temporal,"1");
+						strcpy(mul[i][j],temporal);
+						continue;
+					}
+					
+					if (strcmp(mat1[i][k],"1" )==0){
+						strcat(mul[i][j],"+");//nuevo
+						strcat(mul[i][j],mat2[k][j]);
+						continue;
+					}
+					
+					else if(strcmp(mat2[k][j],"1")==0){
+						strcat(mul[i][j],"+");//nuevo
+						strcat(mul[i][j],mat1[i][k]);
+						continue;
+					}
+					
+					else{
+						strcat(temporal,mat1[i][k]);
+						strcat(temporal,"*");
+						strcat(temporal,mat2[k][j]);
+						strcpy(mul[i][j],temporal);
+					}
+
+					continue;		
+				}
+				
+				if(strcmp(mat1[i][k],"0")!=0 && strcmp(mat2[k][j],"0")!=0 && strcmp(mul[i][j],"0")==0){
+					if (strcmp(mat1[i][k],"1" )==0 && strcmp(mat2[k][j],"1" )==0){
+						strcpy(mul[i][j],"1");
+						continue;
+					}
+					
+					if (strcmp(mat1[i][k],"1" )==0){
+						strcpy(mul[i][j],mat2[k][j]);
+						continue;
+					}
+					
+					else if(strcmp(mat2[k][j],"1")==0){
+						strcpy(mul[i][j],mat1[i][k]);
+						continue;
+					}
+					
+					strcpy(temporal,mat1[i][k]);
+					strcat(temporal,"*");
+					strcat(temporal,mat2[k][j]);
+					strcpy(mul[i][j],temporal);
+					continue;	
+				} 			 
+            }
+        }
+    }
+}
+
+void matrizNormalACSV2(char mat1[4][4][NUMCARACMAX],int numeroMatriz){
+	char tecontarBetas();
+	char temporal[5];
+	char nombre[20];						//Almacena el nombre de los CSVs a crear
+	FILE *fp;
+	printf("KLK YY\n\n");
+	
+	sprintf(temporal,"%d",numeroMatriz);
+	strcpy(nombre,"PMatrizNormal-");
+	strcat(nombre,temporal);
+	strcat(nombre,".csv");
+	fp = fopen(nombre, "w+");
+	if(fp==NULL){
+		printf("\n No se ha podido abrir el fichero ");
+      exit(0);
+	}
+	for (int a =0;a<4;a++){
+		//separación " / "
+		fprintf(fp,"%s\n\n%s\n\n%s\n\n%s\n\n", mat1[a][0], mat1[a][1], mat1[a][2], mat1[a][3]);
+		}	 
+	fclose(fp);
+}	
+
+void matrizNormalACSV3(char mat1[4][4][100],int numeroMatriz){
+	char tecontarBetas();
+	char temporal[5];
+	char nombre[20];						//Almacena el nombre de los CSVs a crear
+	FILE *fp;
+	printf("KLK YY\n\n");
+	
+	sprintf(temporal,"%d",numeroMatriz);
+	strcpy(nombre,"PMatrizNormal-");
+	strcat(nombre,temporal);
+	strcat(nombre,".csv");
+	fp = fopen(nombre, "w+");
+	if(fp==NULL){
+		printf("\n No se ha podido abrir el fichero ");
+      exit(0);
+	}
+	for (int a =0;a<4;a++){
+		//separación " / "
+		fprintf(fp,"%s\n\n%s\n\n%s\n\n%s\n\n", mat1[a][0], mat1[a][1], mat1[a][2], mat1[a][3]);
+		}	 
+	fclose(fp);
+}	
+
+void matrizInversaACSV2(char mat1[4][4][NUMCARACMAX],int numeroMatriz,int tamano){
+	char tecontarBetas();
+	char temporal[5];
+	char nombre[20];						//Almacena el nombre de los CSVs a crear
+	FILE *fp;
+	
+	sprintf(temporal,"%d",numeroMatriz);
+	strcpy(nombre,"PMatrizInversa-");
+	strcat(nombre,temporal);
+	strcat(nombre,".csv");
+	fp = fopen(nombre, "w+");
+	if(fp==NULL){
+		printf("\n No se ha podido abrir el fichero ");
+      exit(0);
+	}
+	for (int a =0;a<4;a++){
+		//separación " / "
+		fprintf(fp,"%s\n\n%s\n\n%s\n\n%s\n\n", mat1[a][0], mat1[a][1], mat1[a][2], mat1[a][3]);
+		}	 
+	fclose(fp);
+}	
+
+
+void copiarMatriz2(char mat1[4][4][NUMCARACMAX],char mat2[4][4][NUMCARACMAX]){
+	for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+			strcpy(mat1[i][j],mat2[i][j]);
+		}
+	}
+}
 
 
 
