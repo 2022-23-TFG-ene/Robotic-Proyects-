@@ -1,12 +1,4 @@
-/*
- *	engdemo.cpp
- *
- *	A simple program to illustrate how to call MATLAB
- *	Engine functions from a C++ program.
- *
- * Copyright 1984-2016 The MathWorks, Inc.
- * All rights reserved
- */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
