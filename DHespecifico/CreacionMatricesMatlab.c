@@ -13,6 +13,8 @@ void CalculosMatlabConjuntosTotal(int contadorMotores,Engine *ep, char variables
 void CalculosMatlabConjuntosParciales(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]);
 void GuardarEnCSVdesdeMatlab(Engine *ep,char nombreCSV[200],char nombreVariable[10]);
 void ModificacionMatricesNormalesEInversas(Engine *ep);
+void CalculosMatlabConjuntosParcialesConSalto(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10], int iteracion);
+
 
 int main(){
 	Engine *ep;
@@ -32,8 +34,10 @@ int main(){
 	IncluirMatlabSyms(contadorMotores,ep);
 	CrearMatricesNormalesSimplesMatlab(contadorMotores,ep,variablesNormales);
 	CrearMatricesInversasSimplesMatlab(contadorMotores,ep,variablesInversas);
-	CalculosMatlabConjuntos(contadorMotores,ep,variablesInversas,variablesNormales);
-	CalculosMatlabConjuntosParciales(contadorMotores,ep,variablesInversas,variablesNormales);
+	//ModificacionMatricesNormalesEInversas(ep);
+	//CalculosMatlabConjuntos(contadorMotores,ep,variablesInversas,variablesNormales);
+	//CalculosMatlabConjuntosParciales(contadorMotores,ep,variablesInversas,variablesNormales);
+	CalculosMatlabConjuntosParcialesConSalto(contadorMotores,ep,variablesInversas,variablesNormales,contadorMotores);
 	
 	
 	//COMPROBACIONES
@@ -49,13 +53,7 @@ int main(){
 	printf("El 2: %s ", variablesInversas[2]);
 	printf("El 1: %s ", variablesInversas[3]);
 	printf("El 0: %s ", variablesInversas[4]);
-	/*
-	engEvalString(ep, "NF=simplify(N1*N2)");
-	engEvalString(ep, "fid = fopen('MATRIZMATLAB.csv', 'w');"); 
-	engEvalString(ep, "fprintf(fid, char(NF));"); 
-	engEvalString(ep, "fclose(fid)");
-	*/
-	
+
 	engClose(ep);
 	
 return EXIT_SUCCESS;
@@ -274,6 +272,7 @@ void CrearMatricesInversasSimplesMatlab(int contadorMotores,Engine *ep, char var
 
 void CalculosMatlabConjuntos(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]){
 	//Total
+	printf("ESTO ES CONtADORES: %d\n",contadorMotores);
 	CalculosMatlabConjuntosTotal(contadorMotores,ep,variablesInversas,variablesNormales);
 	//parejas 12-23-34...
 	
@@ -458,14 +457,60 @@ void GuardarEnCSVdesdeMatlab(Engine *ep,char nombreCSV[200],char nombreVariable[
 
 void ModificacionMatricesNormalesEInversas(Engine *ep){
 	char decision;
+	char nombreArchivo[100];
+	strcpy(nombreArchivo,"VariablesNormalesMATLAB");
 	printf("Si desea sustituir o modificar las matrices normales o inversas en los ficheros \"VariablesNormalesMATLAB\" o \"VariablesInversasMATLAB\"\n");
 	printf("¿Han sido modificadas manualmente las matrices anteriormente mencionadas? (s/n): ");
-	scanf("%c",&decision);
+	scanf(" %c",&decision);
 	if (decision =='s'){
-			
+		printf("k apasau");
+		for(int i=0;i<2;i++){
+			FILE *archivo = fopen(nombreArchivo, "r"); // Modo lectura
+			char bufer[10000];         // Aquí vamos a ir almacenando cada línea
+			printf("\nLas nuevas variables %s son:\n",nombreArchivo);
+			while (fgets(bufer, 10000, archivo)){
+				// Aquí, justo ahora, tenemos ya la línea. Le vamos a remover el salto
+				strtok(bufer, "\n");
+				// La imprimimos, pero realmente podríamos hacer cualquier otra cosa
+				printf("%s\n", bufer);
+				engEvalString(ep, bufer);
+			}
+		fclose(archivo);	
+		strcpy(nombreArchivo,"VariablesInversasMATLAB");
+		}			
 	}
 }
 
+void CalculosMatlabConjuntosParcialesConSalto(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10], int iteracion){
+	char variablesNormalesModificadas[CONTADORMOTORES][10];
+	char variablesInversasModificadas[CONTADORMOTORES][10];
+	char variablesNormalesTemporal[CONTADORMOTORES][10];
+	char variablesInversasTemporal[CONTADORMOTORES][10];
+	int contador=0;
+	//Bucle para ir eliminando variables 
+	for (int i=0;i<iteracion;i++){
+		printf("************que ases************\n");
+		for (int j=0;j<iteracion;j++){
+			printf("ELLOELLOELLO i:%d j:%d iteracion:%d\n", i, j, iteracion);
+			//copia las varialbles a nuevas listas
+			if (i!=j){
+				strcpy(variablesNormalesModificadas[j-contador],variablesNormales[j]);
+				strcpy(variablesInversasModificadas[j-contador],variablesInversas[j]);
+			}
+			else{
+				contador++;	
+			}
+		}
+		contador=0;
+		printf("LLEGAMOS?\n");
+		printf("-------------************************** NORMALES: %s ", variablesNormalesModificadas[0]);
+		for(int k=1;k<iteracion-1;k++){
+			printf("%s ", variablesNormalesModificadas[k]);
+		}
+		CalculosMatlabConjuntos(iteracion-1,ep,variablesInversasModificadas,variablesNormalesModificadas);
+		CalculosMatlabConjuntosParciales(iteracion-1,ep,variablesInversasModificadas,variablesNormalesModificadas);
+	}
+}
 
 
 
