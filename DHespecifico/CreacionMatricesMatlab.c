@@ -21,7 +21,10 @@ int main(){
 	int contadorMotores=CONTADORMOTORES;
 	char variablesNormales[CONTADORMOTORES][10];
 	char variablesInversas[CONTADORMOTORES][10];
-
+	//Borramos la información de ejecuciones anteriores.
+	if (remove("MatricesCalculadas")==0){
+		printf("MatricesCalculadas.txt actualizado\n");
+	}  
 	/*
 	 * Call engOpen with a NULL string. This starts a MATLAB process 
     	 * on the current host using the command "matlab".
@@ -36,7 +39,7 @@ int main(){
 	CrearMatricesInversasSimplesMatlab(contadorMotores,ep,variablesInversas);
 	//ModificacionMatricesNormalesEInversas(ep);
 	//CalculosMatlabConjuntos(contadorMotores,ep,variablesInversas,variablesNormales);
-	//CalculosMatlabConjuntosParciales(contadorMotores,ep,variablesInversas,variablesNormales);
+	CalculosMatlabConjuntosParciales(contadorMotores,ep,variablesInversas,variablesNormales);
 	CalculosMatlabConjuntosParcialesConSalto(contadorMotores,ep,variablesInversas,variablesNormales,contadorMotores);
 	
 	
@@ -272,7 +275,6 @@ void CrearMatricesInversasSimplesMatlab(int contadorMotores,Engine *ep, char var
 
 void CalculosMatlabConjuntos(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]){
 	//Total
-	printf("ESTO ES CONtADORES: %d\n",contadorMotores);
 	CalculosMatlabConjuntosTotal(contadorMotores,ep,variablesInversas,variablesNormales);
 	//parejas 12-23-34...
 	
@@ -283,10 +285,20 @@ void CalculosMatlabConjuntos(int contadorMotores,Engine *ep, char variablesInver
 
 void CalculosMatlabConjuntosTotal(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]){
 	char stringOperacionesMatlab[100000];
-	char temporal [100];
+	char temporal [10];
 	char intastring[100];
-	char nombreTemporalVarialbe [20];
-	printf("TOTAL:\n");
+	//char nombreTemporalVarialbe [20];
+	char nombreCSVMatlab[200];
+	char nombreVariableTemporal[10];
+	
+	strcpy(nombreCSVMatlab,"MatricesCalculadas");
+	
+	for (int v=0;v<contadorMotores;v++){
+		printf("%s ", variablesNormales[v]);
+	}
+	printf("\nTOTAL:\n");
+	//Mismo comentario en fichero  
+	engEvalString(ep, "fprintf(MatricesC, 'TOTAL')");  
 	//NT
 	strcpy(stringOperacionesMatlab,"NT=simplify(");
 	for (int i=0;i<contadorMotores;i++){
@@ -297,7 +309,9 @@ void CalculosMatlabConjuntosTotal(int contadorMotores,Engine *ep, char variables
 	}
 	strcat(stringOperacionesMatlab,")");
 	engEvalString(ep, stringOperacionesMatlab); 
-	printf("\nOperación: %s\n", stringOperacionesMatlab); //Ej: NT=simplify(N1*N2*N3*N4*N5)
+	strcpy(temporal,"NT");
+	GuardarEnCSVdesdeMatlab(ep,nombreCSVMatlab,temporal);
+	printf("\nOperación: %s", stringOperacionesMatlab); //Ej: NT=simplify(N1*N2*N3*N4*N5)
 	//Iteraciones
 	for (int j=0;j<contadorMotores-1;j++){
 			//SNx
@@ -306,14 +320,16 @@ void CalculosMatlabConjuntosTotal(int contadorMotores,Engine *ep, char variables
 			strcat(temporal,intastring);
 			strcpy(stringOperacionesMatlab,temporal);
 			strcat(stringOperacionesMatlab,"=simplify(");
-			for (int m=0;m<contadorMotores-j;m++){
+			for (int m=0;m<contadorMotores-j-1;m++){
 				strcat(stringOperacionesMatlab,variablesNormales[m+1+j]);	
+				//printf("Esto es: %s",variablesNormales[m+1+j]);
 				if (m<contadorMotores-2-j){
 					strcat(stringOperacionesMatlab,"*");
 				}
 			}
 			strcat(stringOperacionesMatlab,")");
-			//engEvalString(ep, stringOperacionesMatlab);					 //ABILITAR FUERA DE PRUEBAS
+			engEvalString(ep, stringOperacionesMatlab);					 //ABILITAR FUERA DE PRUEBAS
+			GuardarEnCSVdesdeMatlab(ep,nombreCSVMatlab,temporal);
 			printf("\nOperación: %s", stringOperacionesMatlab); 
 			//IIx
 			strcpy(temporal,"II");
@@ -328,7 +344,8 @@ void CalculosMatlabConjuntosTotal(int contadorMotores,Engine *ep, char variables
 				}
 			}
 			strcat(stringOperacionesMatlab,")");
-			//engEvalString(ep, stringOperacionesMatlab); 				//ABILITAR FUERA DE PRUEBAS
+			engEvalString(ep, stringOperacionesMatlab); 				//ABILITAR FUERA DE PRUEBAS
+			GuardarEnCSVdesdeMatlab(ep,nombreCSVMatlab,temporal);
 			printf("\nOperación: %s", stringOperacionesMatlab); 
 			//SIx
 			strcpy(temporal,"SI");
@@ -343,7 +360,8 @@ void CalculosMatlabConjuntosTotal(int contadorMotores,Engine *ep, char variables
 				}
 			}
 			strcat(stringOperacionesMatlab,"*NT)");
-			//engEvalString(ep, stringOperacionesMatlab); 				//ABILITAR FUERA DE PRUEBAS
+			engEvalString(ep, stringOperacionesMatlab); 				//ABILITAR FUERA DE PRUEBAS
+			GuardarEnCSVdesdeMatlab(ep,nombreCSVMatlab,temporal);
 			printf("\nOperación: %s", stringOperacionesMatlab); 
 		
 		printf("\n");
@@ -354,16 +372,21 @@ void CalculosMatlabConjuntosTotal(int contadorMotores,Engine *ep, char variables
 
 void CalculosMatlabConjuntosParciales(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]){
 	char stringOperacionesMatlab[100000];
-	char temporal [100];
+	char temporal [10];
 	char intastring[100];
 	int subconjuntos=2;
 	int contador=contadorMotores-1;
 	int contador2=contador;
 	int contador3=1;
-	printf("PARCIALES:");
+	int contador4=1;
+	printf("PARCIALES:\n");
 	for (int i=contadorMotores;i-1>1;i--){ //nº de combinaciones de subconjuntos
 		for (int j=0; j<subconjuntos;j++){ //nº de subconjuntos por combinacióbn
-			printf("\n\nPARCIAL :%d - %d\n", j+1,contador2);
+			printf("\n");
+			for (int v=0;v<contadorMotores;v++){
+				printf("%s ", variablesNormales[v]);
+			}
+			printf("\nPARCIAL :%d - %d\n", j+1,contador2);
 			contador2++;
 			//NTx
 			strcpy(stringOperacionesMatlab,"NT=simplify(");
@@ -417,13 +440,20 @@ void CalculosMatlabConjuntosParciales(int contadorMotores,Engine *ep, char varia
 				sprintf(intastring,"%d",k+1);
 				strcpy(stringOperacionesMatlab,temporal);
 				strcat(stringOperacionesMatlab,intastring);
-				strcat(stringOperacionesMatlab,"=simplify(II");
-				strcat(stringOperacionesMatlab,intastring);
+				strcat(stringOperacionesMatlab,"=simplify(I");
+				for (int s=0;s<contador4;s++){
+					strcat(stringOperacionesMatlab,variablesInversas[j+contador3-s-1]);	
+					if (s<contador4-1){
+						strcat(stringOperacionesMatlab,"*");
+					}
+				}
+				contador4++;
 				strcat(stringOperacionesMatlab,"*NT)");
 				//engEvalString(ep, stringOperacionesMatlab);					 //ABILITAR FUERA DE PRUEBAS
 				printf("\nOperación: %s\n", stringOperacionesMatlab); 
 			}
 			contador3=1;
+			contador4=1;
 		}
 		contador2=i-2;
 		subconjuntos++;
@@ -463,7 +493,6 @@ void ModificacionMatricesNormalesEInversas(Engine *ep){
 	printf("¿Han sido modificadas manualmente las matrices anteriormente mencionadas? (s/n): ");
 	scanf(" %c",&decision);
 	if (decision =='s'){
-		printf("k apasau");
 		for(int i=0;i<2;i++){
 			FILE *archivo = fopen(nombreArchivo, "r"); // Modo lectura
 			char bufer[10000];         // Aquí vamos a ir almacenando cada línea
@@ -486,12 +515,16 @@ void CalculosMatlabConjuntosParcialesConSalto(int contadorMotores,Engine *ep, ch
 	char variablesInversasModificadas[CONTADORMOTORES][10];
 	char variablesNormalesTemporal[CONTADORMOTORES][10];
 	char variablesInversasTemporal[CONTADORMOTORES][10];
+	char separadorParaCSV[200];
 	int contador=0;
+	
+	engEvalString(ep, "MatricesC = fopen('MatricesCalculadas', 'a+');"); 
+	
+	
 	//Bucle para ir eliminando variables 
 	for (int i=0;i<iteracion;i++){
-		printf("************que ases************\n");
+		strcpy(separadorParaCSV,"fprintf(MatricesC, '-------------************************** NORMALES: ");
 		for (int j=0;j<iteracion;j++){
-			printf("ELLOELLOELLO i:%d j:%d iteracion:%d\n", i, j, iteracion);
 			//copia las varialbles a nuevas listas
 			if (i!=j){
 				strcpy(variablesNormalesModificadas[j-contador],variablesNormales[j]);
@@ -502,15 +535,25 @@ void CalculosMatlabConjuntosParcialesConSalto(int contadorMotores,Engine *ep, ch
 			}
 		}
 		contador=0;
-		printf("LLEGAMOS?\n");
-		printf("-------------************************** NORMALES: %s ", variablesNormalesModificadas[0]);
-		for(int k=1;k<iteracion-1;k++){
+		printf("-------------************************** NORMALES: ");
+		for(int k=0;k<iteracion-1;k++){
 			printf("%s ", variablesNormalesModificadas[k]);
+			strcat(separadorParaCSV,variablesNormalesModificadas[k]);
+			strcat(separadorParaCSV," ");
 		}
+		printf("\n");
+		strcat(separadorParaCSV,"')");
+		
+		engEvalString(ep, separadorParaCSV);  
+		engEvalString(ep, "fprintf(MatricesC, newline)");  
+		engEvalString(ep, "fprintf(MatricesC, newline)");  
+		
 		CalculosMatlabConjuntos(iteracion-1,ep,variablesInversasModificadas,variablesNormalesModificadas);
-		CalculosMatlabConjuntosParciales(iteracion-1,ep,variablesInversasModificadas,variablesNormalesModificadas);
+		//CalculosMatlabConjuntosParciales(iteracion-1,ep,variablesInversasModificadas,variablesNormalesModificadas);
+		if(iteracion>3){
+			CalculosMatlabConjuntosParcialesConSalto(contadorMotores,ep,variablesInversasModificadas,variablesNormalesModificadas,iteracion-1);
+		}
 	}
+	//engEvalString(ep, "fclose(MatricesC)");   						//MIRAR PORQUE DA ERROR
 }
-
-
 
