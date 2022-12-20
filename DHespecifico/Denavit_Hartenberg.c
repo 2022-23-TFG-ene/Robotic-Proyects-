@@ -49,7 +49,7 @@ int main(){
 	int decision;
 	printf("**********************************************************************\n");
 	printf("* Este programa crea la matriz de DH en funcion de los motores que   *\n");
-	printf("* indique el usuario y la guarda en el CSV \"MatrizDHGenerica.csv\".  *\n");
+	printf("* indique el usuario y la guarda en el CSV \"MatrizDHGenerica.csv\".   *\n");
 	printf("* Además se crean todas las matrices necesarias para resolver.       *\n");
 	printf("*                                                                    *\n");
 	printf("*                                                                    *\n");
@@ -161,7 +161,7 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i)
 		//Beta
 		//[0][0]
 		strcpy(strtemp,"c(");
-		strcat(strtemp,matriz[i][0]);
+		(strtemp,matriz[i][0]);
 		strcat(strtemp,")");
 		strcpy(matriztem1[0][0],strtemp);
 		//[0][1]
@@ -511,7 +511,7 @@ void matrizInversa(char mat1[4][4][NUMCARACMAX], int i){
 	//[2][3]
 	strcpy(mat1[2][3],"(-d");
 	strcat(mat1[2][3],temporal);
-	strcat(mat1[2][3],"*s(a");
+	strcat(mat1[2][3],"*c(a");
 	strcat(mat1[2][3],temporal);
 	strcat(mat1[2][3],"))");
 	//[3][0]
