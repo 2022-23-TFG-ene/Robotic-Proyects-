@@ -797,6 +797,7 @@ void CalculosMatlabConjuntosTotalNumerica(int contadorMotores,Engine *ep, char v
 	//strcpy(arrayPrueba,engGetVariable(ep, "NZ"));
 	//printf("Esto es2: %s\n",arrayPrueba);
 	//printf("\neyoo2");
+	
 }
 
 
