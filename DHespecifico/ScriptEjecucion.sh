@@ -1,7 +1,11 @@
 #!/bin/bash
+
 #Necesario exportar variables para ejecutar el programa CreacionMatricesMatlab
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/MATLAB/R2022b/bin/glnxa64
 export PATH=$PATH:/usr/local/MATLAB/R2022b/bin
+
+#Si se quiere llamar a matlab usando un terminal con el alias matlab
+#alias matlab='/usr/local/MATLAB/R2022b/bin/glnxa64/MATLAB'  
 
 PS3="Elija el programa a ejecutar: "
 select lng in Denavit_Hartenberg IntroduccionDatosMotores ProgramaSustituirVariablesMatriz CreacionMatricesMatlab Programa_Seguido_1_2_3 Programa_Seguido_2_4 Salir

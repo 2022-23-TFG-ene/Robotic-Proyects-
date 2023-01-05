@@ -7,7 +7,9 @@
 void IncluirMatlabSyms(int contadorMotores,Engine *ep);
 void CrearMatricesNormalesSimplesMatlab(int contadorMotores,Engine *ep, char variablesNormales[contadorMotores][10]);
 void CrearMatricesInversasSimplesMatlab(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10]);
-void CalculosMatlabConjuntos(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]);
+void ModificarMatricesNormalesSimplesMatlab(int contadorMotores,Engine *ep, char variablesNormales[contadorMotores][10],char decision[3],float matriz[CONTADORMOTORES][4]);
+void ModificarMatricesInversasSimplesMatlab(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10],char decision[3],float matriz[CONTADORMOTORES][4]);
+//void CalculosMatlabConjuntos(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]);
 void CalculosMatlabConjuntosTotalNumerica(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]);
 void CalculosMatlabConjuntosTotal(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]);
 void CalculosMatlabConjuntosParciales(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]);
@@ -23,6 +25,8 @@ int main(){
 	char variablesNormales[CONTADORMOTORES][10];
 	char variablesInversas[CONTADORMOTORES][10];
 	int todoNumeros=0;
+	char decision[3];
+	float matriz[CONTADORMOTORES][4];
 	
 	//Borramos la información de ejecuciones anteriores.
 	if (remove("MatricesCalculadas")==0){
@@ -43,14 +47,29 @@ int main(){
 	CrearMatricesNormalesSimplesMatlab(contadorMotores,ep,variablesNormales);
 	CrearMatricesInversasSimplesMatlab(contadorMotores,ep,variablesInversas);
 	todoNumeros=ModificacionMatricesNormalesEInversas(ep);
+	//Sin sustituir elementos
 	if(todoNumeros==0){
-		//CalculosMatlabConjuntos(contadorMotores,ep,variablesInversas,variablesNormales);
-		//CalculosMatlabConjuntosParciales(contadorMotores,ep,variablesInversas,variablesNormales);  //No se usa
 		CalculosMatlabConjuntosTotal(contadorMotores,ep,variablesInversas,variablesNormales);
 		CalculosMatlabConjuntosParcialesConSalto(contadorMotores,ep,variablesInversas,variablesNormales,contadorMotores,todoNumeros);
 	}
+	//Sustituir todos los elementos
 	if(todoNumeros==1){
 		CalculosMatlabConjuntosTotalNumerica(contadorMotores,ep,variablesInversas,variablesNormales);
+		CalculosMatlabConjuntosParcialesConSalto(contadorMotores,ep,variablesInversas,variablesNormales,contadorMotores,todoNumeros);
+	}
+	//Sustituir solo algunos elementos
+	if(todoNumeros==2){
+		//Modificar N e I
+		printf("¿Desea cambiar las alfas? (s/n)");
+		scanf(" %c",&decision[0]);
+		printf("¿Desea cambiar las r? (s/n)");
+		scanf(" %c",&decision[1]);
+		printf("¿Desea cambiar las d? (s/n)");
+		scanf(" %c",&decision[2]);
+		leerfilasCSVParametrosDHespecificos(matriz);
+		ModificarMatricesNormalesSimplesMatlab(contadorMotores,ep,variablesNormales,decision,matriz);
+		ModificarMatricesInversasSimplesMatlab(contadorMotores,ep,variablesInversas,decision,matriz);
+		CalculosMatlabConjuntosTotal(contadorMotores,ep,variablesInversas,variablesNormales);
 		CalculosMatlabConjuntosParcialesConSalto(contadorMotores,ep,variablesInversas,variablesNormales,contadorMotores,todoNumeros);
 	}
 
@@ -269,17 +288,6 @@ void CrearMatricesInversasSimplesMatlab(int contadorMotores,Engine *ep, char var
 	}
 	printf("****************************\n\n");
 }
-
-/*
-void CalculosMatlabConjuntos(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]){
-	//Total
-	CalculosMatlabConjuntosTotal(contadorMotores,ep,variablesInversas,variablesNormales);
-	//parejas 12-23-34...
-	
-	//parciales 1-2/1-3/1-4/2-5
-	
-}*/
-
 
 void CalculosMatlabConjuntosTotal(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10]){
 	char stringOperacionesMatlab[100000];
@@ -536,7 +544,7 @@ int ModificacionMatricesNormalesEInversas(Engine *ep){
 			strcpy(nombreArchivo,"VariablesInversasMATLAB");
 		}			
 	}
-	printf("¿Desea sustituir los parámetros de DH con los creados con el programa IntroduccionDatosMotores.c? (s/n): ");
+	printf("¿Desea sustituir todos los parámetros de DH con los creados con el programa IntroduccionDatosMotores.c? (s/n): ");
 	scanf(" %c",&decision);
 	if (decision =='s'){
 		todoNumeros=1;	
@@ -560,6 +568,11 @@ int ModificacionMatricesNormalesEInversas(Engine *ep){
 			fclose(archivo);	
 			strcpy(nombreArchivo,"VariablesInversasMATLAB");
 		}	
+	}
+	printf("¿Desea sustituir algunos parámetros con los creados con el programa IntroduccionDatosMotores.c? (s/n): ");
+	scanf(" %c",&decision);
+	if (decision =='s'){
+		todoNumeros=2;	
 	}
 	
 	return todoNumeros;
@@ -598,7 +611,7 @@ void CalculosMatlabConjuntosParcialesConSalto(int contadorMotores,Engine *ep, ch
 		engEvalString(ep, separadorParaCSV);  
 		engEvalString(ep, "fprintf(MatricesC, newline)");  
 		engEvalString(ep, "fprintf(MatricesC, newline)");  
-		if(todoNumeros==0){
+		if(todoNumeros==0 || todoNumeros==2){
 			CalculosMatlabConjuntosTotal(iteracion-1,ep,variablesInversasModificadas,variablesNormalesModificadas);
 			//CalculosMatlabConjuntosParciales(iteracion-1,ep,variablesInversasModificadas,variablesNormalesModificadas);
 		}
@@ -801,4 +814,353 @@ void CalculosMatlabConjuntosTotalNumerica(int contadorMotores,Engine *ep, char v
 }
 
 
+void ModificarMatricesNormalesSimplesMatlab(int contadorMotores,Engine *ep, char variablesNormales[contadorMotores][10],char decision[3],float matriz[CONTADORMOTORES][4]){
+	//Crear matrices Normales
+	char matriBaseNormal[100000];
+	char intastring[100];
+	//char alfaastring[100];
+	//char rastring[100];
+	//char dastring[100];
+	char nombreCSVMatlab[200];
+	char nombreVariableTemporal[10];
+	
+	if (remove("VariablesNormalesMATLAB")==0){
+		printf("VariablesNormalesMATLAB.txt actualizado\n");
+	}
+	
+	for (int i=0;i<contadorMotores;i++){
+		sprintf(intastring,"%d",i+1);
+		//sprintf(alfaastring,"%d",matriz[i][1]);
+		//sprintf(rastring,"%d",matriz[i][2]);
+		//sprintf(dastring,"%d",matriz[i][3]);
+		
+		strcpy(variablesNormales[i],"N");
+		strcat(variablesNormales[i],intastring);
+		strcpy(nombreVariableTemporal,variablesNormales[i]);
+		printf("Esto es variablesNormales: %s\n", variablesNormales[i]);
+		
+		//FILA 1
+		strcpy(matriBaseNormal,"N");
+		strcat(matriBaseNormal,intastring);
+		strcat(matriBaseNormal,"=[cos(b");
+		strcat(matriBaseNormal,intastring);
+		strcat(matriBaseNormal,")");
+		
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseNormal," -sin(b");
+				strcat(matriBaseNormal,intastring);
+				strcat(matriBaseNormal,")");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseNormal," 0");
+			}
+		}else{
+			strcat(matriBaseNormal," -cos(a");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,")*sin(b");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,")");
+		}
+		
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseNormal," 0");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseNormal," sin(b");
+				strcat(matriBaseNormal,intastring);
+				strcat(matriBaseNormal,")");
+			}
+		}else{
+			strcat(matriBaseNormal," sin(a");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,")*sin(b");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,")");
+		}
+		
+		if(decision[1]=='s' && matriz[i][2]==0){ //si se quiere sustituir a 
+			strcat(matriBaseNormal," 0;");
+		}
+		else{
+			strcat(matriBaseNormal," r");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,"*cos(b");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,");");
+		}
+		
+		//FILA 2
+		strcat(matriBaseNormal,"sin(b");
+		strcat(matriBaseNormal,intastring);
+		strcat(matriBaseNormal,")");
+		
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseNormal," cos(b");
+				strcat(matriBaseNormal,intastring);
+				strcat(matriBaseNormal,")");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseNormal," 0");
+			}
+		}else{
+			strcat(matriBaseNormal," cos(a");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,")*cos(b");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,")");
+		}	
+		
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseNormal," 0");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseNormal," -cos(b");
+				strcat(matriBaseNormal,intastring);
+				strcat(matriBaseNormal,")");
+			}
+		}else{
+			strcat(matriBaseNormal," -sin(a");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,")*cos(b");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,")");
+		}
+		
+		if (decision[1]=='s' && matriz[i][2]==0){
+			strcat(matriBaseNormal," 0;");
+		}else{
+			strcat(matriBaseNormal," r");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,"*sin(b");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,");");
+		}
+		
+		//FILA 3
+		strcat(matriBaseNormal,"0");
+		
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseNormal," 0");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseNormal," 1");
+			}
+		}else{
+			strcat(matriBaseNormal," sin(a");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,")");
+		}
+		
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseNormal," 1");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseNormal," 0");
+			}
+		}else{
+			strcat(matriBaseNormal," cos(a");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,")");
+		}
+		
+		if(decision[2]=='s' && (matriz[i][3]==0)){ 
+			strcat(matriBaseNormal," 0;");
+		}else{
+			strcat(matriBaseNormal," d");
+			strcat(matriBaseNormal,intastring);
+			strcat(matriBaseNormal,";");
+		}
+		//FILA 4
+		strcat(matriBaseNormal,"0 0 0 1]");
+		
+		engEvalString(ep, matriBaseNormal); 
+		printf("%s\n\n", matriBaseNormal);
+		strcpy(nombreCSVMatlab,"VariablesNormalesMATLAB");
+		GuardarEnCSVdesdeMatlab(ep,nombreCSVMatlab,nombreVariableTemporal,0);
+	}
+	printf("****************************\n\n");
+}
 
+void ModificarMatricesInversasSimplesMatlab(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10],char decision[3],float matriz[CONTADORMOTORES][4]){
+	//Crear matrices Inversas
+	char matriBaseInversa[100000];
+	char intastring[100];
+	//char alfaastring[100];
+	//char rastring[100];
+	//char dastring[100];
+	char nombreCSVMatlab[200];
+	char nombreVariableTemporal[10];
+	
+	if (remove("VariablesInversasMATLAB")==0){
+		printf("VariablesInversasMATLAB.txt actualizado\n");
+	}
+	
+		
+	//decision a-r-d
+	//matriz b-a-r-d
+	
+	for (int i=0;i<contadorMotores;i++){
+		sprintf(intastring,"%d",i+1);
+		
+		strcpy(variablesInversas[i],"I");
+		strcat(variablesInversas[i],intastring);
+		strcpy(nombreVariableTemporal,variablesInversas[i]);
+		printf("Esto es variablesNormales: %s\n", variablesInversas[i]);
+		//FILA 1
+		strcpy(matriBaseInversa,"I");
+		strcat(matriBaseInversa,intastring);
+		strcat(matriBaseInversa,"=[cos(b");
+		strcat(matriBaseInversa,intastring);
+		strcat(matriBaseInversa,")");
+		
+		strcat(matriBaseInversa," sin(b");
+		strcat(matriBaseInversa,intastring);
+		strcat(matriBaseInversa,")");
+		
+		strcat(matriBaseInversa," 0");
+		
+		if(decision[1]=='s' && matriz[i][2]==0){ //si se quiere sustituir a 
+			strcat(matriBaseInversa," 0;");
+		}else{
+			strcat(matriBaseInversa," -r");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,";");
+		}
+		
+		//FILA 2																			VOOOOOOOOOOOOOOOOOOOOOOY AQQQQQQQQQQQQQQUUUUUUUUUUUUUUUUUUUUUUUUUUUUUIIIIIIIIIIIIIIIIIIIIIIII cambiar a cosd
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseInversa," -sin(b");
+				strcat(matriBaseInversa,intastring);
+				strcat(matriBaseInversa,")");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseInversa," 0");
+			}
+		}else{
+			strcat(matriBaseInversa," -cos(a");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")*sin(b");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")");
+		}
+		
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseInversa," cos(b");
+				strcat(matriBaseInversa,intastring);
+				strcat(matriBaseInversa,")");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseInversa," 0");
+			}
+		}else{
+			strcat(matriBaseInversa," cos(a");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")*cos(b");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")");
+		}
+		
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseInversa," 0");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseInversa," 1");
+			}
+		}else{
+			strcat(matriBaseInversa," sin(a");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")");
+		}
+		
+		if(decision[0]=='s' && (matriz[i][3]!=0 || decision[2]=='n')){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){	
+				strcat(matriBaseInversa," 0;");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseInversa," -(d");
+				strcat(matriBaseInversa,intastring);
+				strcat(matriBaseInversa,");");
+			}
+		}else if (decision[2]=='s' && matriz[i][3]==0){
+			strcat(matriBaseInversa," 0;");
+		}else{
+			strcat(matriBaseInversa," -sin(a");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")*(d");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,");");
+		}
+		
+		//FILA 3
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseInversa," 0");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseInversa," sin(b");
+				strcat(matriBaseInversa,intastring);
+				strcat(matriBaseInversa,")");
+			}
+		}else{
+			strcat(matriBaseInversa," sin(a");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")*sin(b");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")");
+		}
+		
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){
+				strcat(matriBaseInversa," 0");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseInversa," -cos(b");
+				strcat(matriBaseInversa,intastring);
+				strcat(matriBaseInversa,")");
+			}
+		}else{
+			strcat(matriBaseInversa," -sin(a");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")*cos(b");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")");
+		}
+
+		if(decision[0]=='s'){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){	
+				strcat(matriBaseInversa," 1");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseInversa," 0");
+			}
+		}else{
+			strcat(matriBaseInversa," cos(a");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")");
+		}
+		
+		if(decision[0]=='s' && (matriz[i][3]!=0 || decision[2]=='n')){ //si se quiere sustituir a 
+			if(matriz[i][1]==0){	
+				strcat(matriBaseInversa," -(d");
+				strcat(matriBaseInversa,intastring);
+				strcat(matriBaseInversa,");");
+			}else if(matriz[i][1]==90){
+				strcat(matriBaseInversa," 0;");
+			}
+		}else if (decision[2]=='s' && matriz[i][3]==0){
+			strcat(matriBaseInversa," 0;");
+		}else{
+			strcat(matriBaseInversa," -cos(a");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,")*(d");
+			strcat(matriBaseInversa,intastring);
+			strcat(matriBaseInversa,");");
+		}
+		
+		
+		//FILA 4
+		strcat(matriBaseInversa,"0 0 0 1]");
+		
+		engEvalString(ep, matriBaseInversa); 
+		printf("%s\n\n", matriBaseInversa);
+		strcpy(nombreCSVMatlab,"VariablesInversasMATLAB");
+		GuardarEnCSVdesdeMatlab(ep,nombreCSVMatlab,nombreVariableTemporal,0);
+	}
+	printf("****************************\n\n");
+}
