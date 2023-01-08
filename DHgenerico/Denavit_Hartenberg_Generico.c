@@ -21,14 +21,14 @@ int main(){
 	printf("* El primer elemento a introducir deberá ser un motor.     *\n");
 	printf("* Posteriormente se irán intercalando motores y segmentos. *\n");
 	printf("* Los segmentos no tienen dirección ya uqe va determinada  *\n");
-	printf("* Por el motor.											   *\n");
+	printf("* Por el motor.                                            *\n");
 	printf("************************************************************\n");
 	//Contador tamaño
 	int tamano=0;
 	while(1){
 		AnadirMotor(tamano);
 		tamano=tamano+1;
-		printf( "Pulsa cualquier tecla para continuarañadiendo motores/segmentos \n" );
+		printf( "Pulsa cualquier tecla para continuar añadiendo motores\n" );
 		printf( "Pulsa Q para acabar.\n" );
 		char c;
 		scanf(" %c", &c);
