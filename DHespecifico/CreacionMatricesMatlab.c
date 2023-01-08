@@ -3,6 +3,7 @@
 #include <string.h>
 #include "engine.h"
 #define  CONTADORMOTORES 3
+#define  PI 3.14159265
 
 void IncluirMatlabSyms(int contadorMotores,Engine *ep);
 void CrearMatricesNormalesSimplesMatlab(int contadorMotores,Engine *ep, char variablesNormales[contadorMotores][10]);
@@ -18,6 +19,7 @@ int ModificacionMatricesNormalesEInversas(Engine *ep);
 void CalculosMatlabConjuntosParcialesConSalto(int contadorMotores,Engine *ep, char variablesInversas[CONTADORMOTORES][10], char variablesNormales[contadorMotores][10], int iteracion, int todoNumeros);
 void leerfilasCSVParametrosDHespecificos(float matriz[CONTADORMOTORES][4]);
 void sustituirParametrosDH(Engine *ep, float matriz[CONTADORMOTORES][4]);
+void DibujarRobotMatlab(Engine *ep, float matriz[CONTADORMOTORES][4]);
 
 int main(){
 	Engine *ep;
@@ -47,6 +49,7 @@ int main(){
 	CrearMatricesNormalesSimplesMatlab(contadorMotores,ep,variablesNormales);
 	CrearMatricesInversasSimplesMatlab(contadorMotores,ep,variablesInversas);
 	todoNumeros=ModificacionMatricesNormalesEInversas(ep);
+	leerfilasCSVParametrosDHespecificos(matriz);
 	//Sin sustituir elementos
 	if(todoNumeros==0){
 		CalculosMatlabConjuntosTotal(contadorMotores,ep,variablesInversas,variablesNormales);
@@ -66,13 +69,13 @@ int main(){
 		scanf(" %c",&decision[1]);
 		printf("¿Desea cambiar las d? (s/n)");
 		scanf(" %c",&decision[2]);
-		leerfilasCSVParametrosDHespecificos(matriz);
 		ModificarMatricesNormalesSimplesMatlab(contadorMotores,ep,variablesNormales,decision,matriz);
 		ModificarMatricesInversasSimplesMatlab(contadorMotores,ep,variablesInversas,decision,matriz);
 		CalculosMatlabConjuntosTotal(contadorMotores,ep,variablesInversas,variablesNormales);
 		CalculosMatlabConjuntosParcialesConSalto(contadorMotores,ep,variablesInversas,variablesNormales,contadorMotores,todoNumeros);
 	}
-
+	DibujarRobotMatlab(ep, matriz);
+	
 	engEvalString(ep, "fclose('all');"); 	
 	engClose(ep);
 	
@@ -1163,4 +1166,52 @@ void ModificarMatricesInversasSimplesMatlab(int contadorMotores,Engine *ep, char
 		GuardarEnCSVdesdeMatlab(ep,nombreCSVMatlab,nombreVariableTemporal,0);
 	}
 	printf("****************************\n\n");
+}
+
+void DibujarRobotMatlab(Engine *ep, float matriz[CONTADORMOTORES][4]){
+	char valorfloat[100];
+	char stringOperacionesMatlab[100000];
+	char stringOperacionesMatlab2[100000];
+	char numeroMotor [100];
+	//lanza script que carga la biblioteca creo revisar
+	engEvalString(ep, "startup_rvc"); 
+	
+	strcpy(stringOperacionesMatlab2, "bot = SerialLink([");
+	//bot = SerialLink([L1 L2 L3], 'name', 'my robot')
+	
+	printf("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n");
+	for (int i=0;i<CONTADORMOTORES;i++){
+		if (i!=0){
+			strcat(stringOperacionesMatlab2, " ,");
+		}
+		strcpy(stringOperacionesMatlab,"L");
+		strcat(stringOperacionesMatlab2,"L");
+		sprintf(numeroMotor,"%d",i+1);
+		strcat(stringOperacionesMatlab,numeroMotor);
+		strcat(stringOperacionesMatlab2,numeroMotor);
+		strcat(stringOperacionesMatlab,"=Link('d',");
+		sprintf(valorfloat,"%f",matriz[i][2]);
+		strcat(stringOperacionesMatlab,valorfloat);
+		strcat(stringOperacionesMatlab,", 'a',");
+		sprintf(valorfloat,"%f",matriz[i][3]);
+		strcat(stringOperacionesMatlab,valorfloat);
+		strcat(stringOperacionesMatlab,")");
+		
+		printf("OPERACiÓN1: %s\n", stringOperacionesMatlab);
+		engEvalString(ep, stringOperacionesMatlab);
+	}
+	strcat(stringOperacionesMatlab2, "], 'name', 'Robot DH')");
+	
+	fflush(stdin);
+	
+	
+	printf("OPERACIÓN2: %s\n", stringOperacionesMatlab2);
+	engEvalString(ep, stringOperacionesMatlab2); 
+	
+	printf("pulse enter para continuar. ");
+	engEvalString(ep, "bot.plot([0 0 1.57])"); 
+	getchar();
+	
+	fgetc(stdin);
+	printf("JODEEEER");
 }
