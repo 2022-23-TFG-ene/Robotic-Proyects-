@@ -43,7 +43,6 @@ int main(){
 	
 	if (decision==0){
 		introducirMotores();
-		//guardarDatosInicialesCSV(datosCSV);
 		
 		float matriz[NUMMOT][4];
 		introduccionDatos=tipoIntroduccionDatos();
@@ -546,7 +545,7 @@ void informacionMotoresAutomatico(){
 	printf("\t    |  /            \n");
 	printf("\t    | /             \n");
 	printf("\t    . --------x     \n");
-	printf("\tp2 Inicialmente colocaremos el robot de tal manera uqe los ejes de los motores esten perpendiculares al usuario, ,perpendiculares al suelo o paralelos al usuario y al suelo.");
+	printf("\tp2 Inicialmente colocaremos el robot de tal manera uqe los ejes de los motores esten perpendiculares al usuario, perpendiculares al suelo o paralelos al usuario y al suelo.");
 }
 
 /**

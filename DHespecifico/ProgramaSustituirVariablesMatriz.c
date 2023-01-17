@@ -50,11 +50,10 @@ int main(){
 	char matriztem[4][4][NUMCARACMAX]; 			//matriz donde se almacenan la matriz de DH sin operar (con strings en las celdas)
 	char matrizPosFijo[4][4][NUMCARACMAX]; 		//matriz donde se guardan las operaciones en postfijo
 	float *listaValores[(int)(NUMCARACMAX/4)];	//lista que almacena en orden los valores a sustituir en la matriz de DH
-	int senosycosenos[NUMCARACMAX];			//relacción de todos los tipos de valores a sustituir en la matriz de DH
+	int senosycosenos[NUMCARACMAX];			    //relacción de todos los tipos de valores a sustituir en la matriz de DH
 	int possenoycoseno=0;						//marca la posición en la lista de senosycosenos.
 	float resultado[4][4];						//matriz final donde se encuentran los valores finales de la matriz calculada de DH
 	char basura='0';
-	//Nuevo
 	char CSVASustituir[20];
 	char csvAMatrizResultado[16][NUMCARACMAX];
 	
@@ -72,7 +71,7 @@ int main(){
 		printf("Introduzca el CSV de la matriz con la que quiere trabajar (nombre.csv)");
 		scanf(" %s",CSVASustituir);
 		scanf("%c",&basura); 
-		printf("Esto es CSVA %s***************************************************************************************************************************************************************************************\n\n\n\n\n\n",CSVASustituir);
+		printf("Esto es CSVA %s\n\n",CSVASustituir);
 		if(strcmp(CSVASustituir,"MatrizDHGenerica.csv")==0){
 			printf("\n\nEntra aquí");
 			inicializarMatrizZeros(matriztem);
@@ -794,8 +793,6 @@ void csvAMatrizDeFila(char CSVASustituir[20],char csvAMatriz[16][NUMCARACMAX]){
 		fgets(buffer,NUMCARACMAX,pfichero);
 		//fscanf(pfichero,"%[^\n]",buffer);
 		longitud=strlen(buffer);
-		printf("Longitud es: %d",longitud);
-		
 		if(flag==1){
 			flag=0;
 			continue;

@@ -224,7 +224,7 @@ void calculaMatrizDH(int filasusadas,char matrizFinal[4][4][NUMCARACMAX], int i)
 			}	
 		}
 	}
-	printf("MATRIZ ----FINAL/A guradar en un CSV\n");
+	printf("MATRIZ ----FINAL/A guardar en un CSV\n");
 	int a =0;
 	int b=0;
 	for (a=0;a<4;a++){

@@ -35,7 +35,7 @@ do
 			gcc IntroduccionDatosMotores.c
 			./a.out
 			echo "$lng - Ejecuntando ProgramaSustituirVariablesMatriz"
-			gcc ProgramaSustituirVariablesMatriz.c -lm
+			gcc ProgramaSustituirVariablesMatriz.c -lm 
 			./a.out;;
 		"Programa_Seguido_2_4")
 			echo "$lng - Ejecutando IntroduccionDatosMotores"
