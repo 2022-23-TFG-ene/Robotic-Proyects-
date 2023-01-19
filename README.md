@@ -34,3 +34,12 @@ para acercarse al punto final con una ángulo determinado.
 
 # Estructura
 ## DHespecífico
+Contiene el programa que calcula la matriz numérica de Denavit Hartenberg
+## DHGenerico
+Contiene el programa que calcula la matriz simbólica de Denavit Hartenberg, el problema que genera la matriz de DH, un programa para sustituir valores en la matriz simbólica de Denavit Hartenbergy el programa que genera todas las matrices necesarias para el cálculo de CD y CI.
+## Documentacion
+Contiene toda la documentación del TFG. Tanto memoria como anexos.
+## Ejemplo código Arduinos
+En este fichero se encuentran todos los programas de Arduino. Son ejemplos prácticos funcionales de la aplicabilidad de las ecuaciones obtenidas a partir de Denavit Hartenberg.
+## Videos
+Aquí se encuentran videos explicativos del proyecto.
