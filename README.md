@@ -31,3 +31,6 @@ añadiendo además una técnica de Desacoplamiento en Subproblemas
 (Grupos de Articulaciones), más sencillos de resolver. Además se
 determinará la ventaja de definir Planos de Ataque y Ángulos de Ataque
 para acercarse al punto final con una ángulo determinado.
+
+# Estructura
+##DHespecífico
