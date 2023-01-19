@@ -1,6 +1,6 @@
-**En este readme se va a meter una pequeña descripción de cada documento. Está por hacer
 
-Para facilitar la comprensión de técnica de la memoria, se recomienda la lectura de los siguientes apartados.
+# Memoria
+Para facilitar la comprensión de técnica de la memoria, se recomienda la lectura de los siguientes apartados de la memoria.
 
 Conceptos:
 	1 - Introducción.
